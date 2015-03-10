@@ -1,0 +1,17 @@
+{
+  "name": "Best-Deal",
+  "version": "0.0.0",
+  "authors": [
+    "Amit Rotbard <amit.rotbard@gmal.com>"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "bower_components"
+  ],
+  "dependencies": {
+    "angular": "~1.2.16",
+    "bootstrap": "~3.1.1",
+    "jquery": "~1.11.2"
+  }
+}

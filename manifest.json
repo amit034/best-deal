@@ -1,0 +1,29 @@
+{
+    "manifest_version": 2,
+
+    "name": "Best-Deal",
+    "description": "Mirai Web extension",
+    "version": "1.0",
+    "permissions": [
+        "cookies", "tabs", "notifications"
+    ],
+
+    "content_scripts": [
+        {
+            "matches": ["http://*/*"],
+            "js": ["bower_components/jquery/dist/jquery.min.js","js/content.js",
+                    "js/frameBuilder.js"]
+        }
+    ],
+
+    "browser_action": {
+
+    } ,
+    "web_accessible_resources": [
+        "css/*.css",
+        "js/*.js",
+        "partials/*.html",
+        "bower_components/*.*"
+    ],
+    "content_security_policy": "script-src 'self' https://ajax.googleapis.com; object-src 'self'"
+}
