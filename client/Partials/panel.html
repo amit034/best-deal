@@ -1,0 +1,123 @@
+
+<div class="root-class fo-reset fo-container" data-bind="css: {'fo-closed': collapsed, 'fo-hidden': hidden}, template: {afterRender: postRenderHandler}">
+
+    <div class="fo-sub-wrapper">
+
+        <div class="fo-handle" data-bind="click: toggleCollapsed">
+            <div class="fo-handle-inner"></div>
+        </div>
+
+        <div class="fo-tabs-wrapper">
+            <div class="fo-handles">
+                <div class="fo-tab-handle fo-deals-tab-handle" data-bind="visible: bannersModel.banners.length, css: {'fo-active': selectedTab() == 0}, click: function() { selectTab(0) }">
+                    <!--ko text: strings['deals_tab']--><!--/ko-->
+                </div>
+            </div>
+
+            <script type="text/html" id="root-class-deals-header-template" data-bind="html: strings['deals_header']"></script>
+
+            <div class="fo-deals-tab fo-tab" data-bind="visible: selectedTab() == 0">
+                <div class="fo-deals-header fo-header" data-bind="html: strings['deals_header']">
+
+                </div>
+                <div class="fo-scroll-btn fo-scroll-up fa fa-chevron-up" data-scroll-step="-1" data-bind="visible:bannersModel.banners.length > 4"></div>
+                <div class="fo-list-wrapper">
+                    <ul class="fo-list">
+                        <!-- ko foreach: { data: bannersModel.banners }-->
+                        <li>
+                            <!--ko if: banner.title-->
+                            <!--<a data-bind="attr: {href: banner.url}" target="_self">-->
+                                <div class="fo-item" buy-text="hi there" data-bind="attr: {'buy-text': banner.prices ? $parent.strings['buy']: $parent.strings['compare']}, event: { click:onClick, mouseover: hoverStart, mouseout: hoverEnd }">
+
+                                    <div class="fo-thumb" data-bind="style: {backgroundImage: 'url(\'' + banner.image + '\')'}"></div>
+
+                                    <!--ko if: banner.freeShipping-->
+                                    <div class="fo-free-shipping"> <!--ko text: $parent.strings['free_shipping']--><!--/ko--></div>
+                                    <!--/ko-->
+
+                                    <div class="fo-overflow-wrapper">
+                                        <!--div class="fo-ribbon" data-bind="visible: banner.ribbon.length, text:$parent.strings['deals_header2']"></div -->
+                                        <!--<div class="fo-ribbon" data-bind="visible: banner.ribbon.length, text:$parent.strings[banner.ribbon]"></div>-->
+                                    </div>
+
+                                    <div class="fo-title elps" data-bind="text: banner.title"></div>
+                                    <!-- ko if: banner.prices  -->
+                                     <div class="fo-price" data-bind="html: banner.prices.lowest? banner.prices.lowest + '$' : '' "></div>
+                                    <!-- /ko -->
+                                    <!-- ko if: banner.date -->
+                                    <div class="fo-merchant elps" data-bind="html: banner.date"></div>
+                                    <!-- /ko -->
+                                </div>
+                            <!--</a>-->
+                            <!-- /ko -->
+
+                            <!--ko if: !banner.title-->
+                            <!--<a data-bind="attr: {href: banner.url}" target="_self">-->
+                            <div class="fo-item" buy-text="hi there" data-bind="attr: {'buy-text': $parent.strings['compare']}, event: { click:onClick, mouseover: hoverStart, mouseout: hoverEnd }">
+
+                                <div class="fo-title elps" data-bind="text: 'Compare with Best Best Deals'"></div>
+
+                            </div>
+                            <!--</a>-->
+                            <!-- /ko -->
+
+                        </li>
+                        <!-- /ko -->
+                    </ul>
+
+                </div>
+                <div class="fo-scroll-btn fo-scroll-down fa fa-chevron-down"  data-scroll-step="1" data-bind="visible:bannersModel.banners.length > 4"></div>
+            </div>
+
+
+
+        </div>
+
+        <div class="fo-footer">
+            <div class="fo-getmore"><a data-bind="attr: {href: moreDealsUrl}" target="_blank"><!--ko text: strings['more_deals']--><!--/ko--></a></div>
+
+            <div class="fo-close fo-tools-btn" data-bind="click: hide"><i class="fa fa-times"></i></div>
+
+
+            <div class="fo-suspend fo-tools-btn">
+                <i class="fa fa-cog"></i>
+                <div class="fo-suspend-tooltip" data-bind="with: suspendTarget">
+                    <div class="fo-suspend-tooltip-inner">
+                        <div class="fo-suspend-label">Suspend for:</div>
+
+                        <!-- ko foreach: suspendPeriods-->
+                        <div class="fo-suspend-option">
+                            <input type="radio" id="sus1" name="suspss"  data-bind="checkedValue: ms, checked: $parent.selectedPeriodMS">
+                            <span data-bind="text: text"></span>
+                        </div>
+                        <!-- /ko -->
+
+                        <div class="fo-suspend-btns">
+                            <div class="fo-suspend-ok-button fo-tooltip-btn" data-bind="click: applySelectedSuspension"><i class="fa fa-check"></i></div>
+                            <div class="fo-suspend-close-button fo-tooltip-btn"><i class="fa fa-times"></i></div>
+                        </div>
+
+                        <div class="fo-suspend-more">
+                            <a id="suspendSite" href="#" data-bind="click: openSuspendWindow">more options...</a>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="fo-attribution-footer">
+            <div class="fo-testx">
+                <!--ko text: strings['attribution1']--><!--/ko--> <a class="fo-provider" target="_blank" data-bind="text: providerName, attr: { href: providerLink }"></a>
+            </div>
+            <div data-bind="visible: extraAttribution">
+                <!--ko text: strings['attribution2']--><!--/ko--> <span data-bind="text: extraAttribution"></span>
+            </div>
+        </div>
+    </div>
+
+    <!-- div data-bind="visible: couponsMessage, text: couponsMessage" class="fo-notification-box"-->
+
+    </div>
+
+</div>
