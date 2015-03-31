@@ -12,6 +12,6 @@ module BD.APP.Context {
 
         iframeStoreSrc():string;
 
-
+        getProductQualifiedName(productComponentName:string);
     }
 }

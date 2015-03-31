@@ -26,7 +26,18 @@ module BD.APP {
 
         init(params:AppParams, domain:string):void {
 
+            for (var key in params.products) {
 
+                if (params.products.hasOwnProperty(key) && window['BD_SKIP_' + key]) {
+                    Logger.info("Skip flag was set for product: [" + key + "]. It will be removed from the list of products.");
+                    delete params.products[key];
+                }
+            }
+
+            if (Common.Collection.getKeys(params.products).length == 0) {
+                Logger.info("No products exist. Possibly they were all skipped due to FO_SKIP flag.");
+                return;
+            }
             var paths = new Context.Paths(domain);
             var context:Context.AppContext = new Context.AppContext(paths, params);
             var externalRoot = context.paths().outerResourcesRoot() + "/";
@@ -48,6 +59,7 @@ module BD.APP {
                 .done(() => this.loadApplicationSettings(context))
                 .fail(err => Logger.error("Shared: Library load failed: " + err.message));
         }
+
         loadApplicationSettings(appCotext:Context.AppContext):void {
             Logger.log("Libraries loaded. Loading application context");
 
@@ -62,6 +74,16 @@ module BD.APP {
 
             var contextAndProductPromises:{[index:string]: Common.Promise<any>} = {};
             contextAndProductPromises["CTX"] = contextPromise;
+
+            for (var productName in appCotext.params().products) {
+                var productDefs =appCotext.params().products[productName];
+                for (var l = 0; l < productDefs.length; l++) {
+
+                    var productPromise = Common.Res.loadProduct(appCotext.paths(), productName, productDefs[l].logic, productDefs[l].visual);
+                    contextAndProductPromises["PRODUCT_" + productName] = productPromise;
+                }
+
+            }
 
             Common.namedWhen2(contextAndProductPromises)
                 .done(res => {
@@ -88,35 +110,150 @@ module BD.APP {
            // }, 1.0, false);
 
 
-            var products:Products.Product = new Products.Product("tickets", new Products.TicketsLogic(), new Products.IFrameRightSlider());
+            var products:Products.Product[] = [];
+            for (var key in resources) {
+                if (key.indexOf("PRODUCT") == 0) products.push(resources[key]);
+            }
 
-            this.loadProduct(context, products);
+            this.selectProducts(context, products);
         }
 
 
 
+        selectProducts(context:Context.IAppContext, products:Products.Product[]):void {
+
+            var productNames = Common.Collection.select(products, (p) => p.name).join(",");
+            Logger.log("loaded product code for " + productNames);
+
+            // Round up classification promises from product logics
+            var classificationPromises:{[index:string]: Common.Promise<Common.INamedValue<number>>} = {};
+            for (var p = 0; p < products.length; p++) {
+
+                var product = products[p];
+                var visualContext = new Context.VisualContext(context, product.name, product.visual);
+
+                // Check suspension by realestate (single visual and therefore single realestate per visual)
+                var realestateSuspendId = Products.VisualRealEstate[product.visual.realEstate()];
+                var isSuspended = context.suspender().isSuspended(realestateSuspendId);
+
+                if (isSuspended) {
+                    Logger.info("Realestate " + realestateSuspendId + " Is suspended. Product " + product.name + " will not be displayed");
 
 
 
+                    continue;
+                }
 
-        loadProduct(context:Context.IAppContext, product:Products.Product) {
+                for (var l = 0; l < product.logics.length; l++) {
+                    var logic:Products.IProductLogic = product.logics[l];
 
 
-            Logger.info("initializing Product");
+                        var lvContext = new Context.LVContext(context, product.name, logic, product.visual);
+                        classificationPromises[logic.flag()] = logic.classify(lvContext)
+                            .logPassthrough("Logic classification score for " + logic.flag());
 
-            var realestateSuspendId = Products.VisualRealEstate[product.visual.realEstate()];
-            var isSuspended = context.suspender().isSuspended(realestateSuspendId);
-            var visualContext = new Context.VisualContext(context, product.name, product.visual);
-            if (isSuspended) {
-                Logger.info("Realestate " + realestateSuspendId + " Is suspended. Product " + product.name + " will not be displayed");
-                // todo: a visual context??
-               // Logger.Analytics.notify(visualContext, Logger.Analytics.NO_SHOW, {'reason': 'suspended'}, 0);
 
-                return;
+                }
             }
 
-            var sync = new Common.DataSynchronizer();
+            // Join all logic classification promises.
+            var framedLogicsPromise = Common.namedWhen2(classificationPromises).fail((err) => {
+                Logger.error("Failed classification: " + err.message);
+                //SharedApp.injectAlt(context, "fail-cls");
+            });
 
+
+            // Round up all products with positive classifying logics
+            var framedProductsPromise = framedLogicsPromise.then((results:{[index:string]: Common.INamedValue<number>}) => {
+                var logicQualifyingProducts:{product: Products.Product; score:number}[] = [];
+
+                for (var p = 0; p < products.length; p++) {
+                    var product= products[p];
+                    var visualContext = new Context.VisualContext(context, product.name, product.visual);
+
+                    // Check suspension by realestate (single visual and therefore single realestate per visual)
+                    var realestateSuspendId = Products.VisualRealEstate[product.visual.realEstate()];
+                    var isSuspended = context.suspender().isSuspended(realestateSuspendId);
+                    if (isSuspended) continue;
+
+                    var highestScoringLogic = null;
+                    var topLogicScore = 0;
+                    var topScoreReason:string = null;
+                    var validLogics:Products.IProductLogic[] = [];
+
+                    for (var l = 0; l < product.logics.length; l++) {
+                        var logic = product.logics[l];
+                        var logicResult = results[logic.flag()];
+
+                        if (logicResult) {
+                            var logicScore = logicResult.value;
+                            var scoreReason = logicResult.name;
+
+                            if (logicScore > 0) {
+                                validLogics.push(logic);
+
+                            }
+
+                            if (topScoreReason == null || logicScore > topLogicScore) {
+                                topLogicScore = logicScore;
+                                highestScoringLogic = logic;
+                                topScoreReason = scoreReason;
+                            }
+                        }
+                        else {
+                            Logger.log("Skipping logic " + logic.flag() + ". Did not reach classification");
+                        }
+                    }
+
+                    if (topLogicScore <= 0) {
+
+                        Logger.log("Skipping product " + product.name + ". Top logic classification returned " + topLogicScore + " with reason " + topScoreReason);
+                        //Logger.Analytics.notify(visualContext, Logger.Analytics.NO_SHOW, {'reason': topScoreReason}, 0);
+                    }
+                    else {
+                        // IMPORTANT: only keep the qualifying logics in the product.
+                        product.logics = validLogics;
+                        logicQualifyingProducts.push({product: product, score: topLogicScore});
+                    }
+                }
+
+                return logicQualifyingProducts;
+            });
+
+
+            // Select products based on classification scores and clashing realestate
+            var selectedProductsPromise = framedProductsPromise.then((productScores) => Common.RealEstateHelper.resolveProductsByRealEstate(context, productScores))
+                .fail((err) => {
+                    Logger.error("Failed realestate resolution: " + err.message);
+                });
+
+
+            selectedProductsPromise.then((selectedproducts:Products.Product[]) => {
+                // We set selected products so that they can be removed on refresh-less url change
+               // this.selectedProducts = selectedproducts;
+
+                if (selectedproducts.length == 0) {
+                    Logger.info("FO complete: no products selected.");
+                }
+                else {
+                    this.loadProducts(context,selectedproducts);
+                }
+            }).fail((err:Common.Rejection) => {
+                Logger.error("Failed selected product initialization: " + err.message);
+            });
+        }
+
+        loadProducts(context:Context.IAppContext, products:Products.Product[]) {
+
+
+            var productNames = Common.Collection.select(products, (p) => p.name).join();
+            Logger.info("initializing products " + productNames);
+
+
+
+            var sync = new Common.DataSynchronizer();
+            var displayProductsPromises = Common.Collection.select(products, (product) => {
+                var visualContext = new Context.VisualContext(context, product.name, product.visual);
                 var dataPromise = this.obtainProductData(context, product, sync).fail(err => {
                     Logger.error("Failed retrieving data for product " + product.name + ": " + err.message);
                 });
@@ -130,7 +267,12 @@ module BD.APP {
                 }).done(() => {
                     Logger.log("Product " + product.name + " displayed");
                 });
+            });
 
+            Common.typedWhen(displayProductsPromises).always(() => {
+                Logger.info("BD complete: " + productNames);
+                Logger.timeEnd("BD end to end");
+            });
 
         }
 

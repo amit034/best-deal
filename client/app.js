@@ -151,6 +151,9 @@ var BD;
                 Paths.prototype.staticContentRoot = function () {
                     return "//" + this._domain + "";
                 };
+                Paths.prototype.getProductQualifiedName = function (productComponentName) {
+                    return "BD.APP.Products." + productComponentName;
+                };
                 return Paths;
             })();
             Context.Paths = Paths;
@@ -2472,6 +2475,7 @@ var BD;
 /// <reference path="../Common/HtmlHelper.ts"/>
 /// <reference path="../Common/NativeJSHelper.ts"/>
 /// <reference path="../Common/Promise.ts"/>
+/// <reference path="../Common/Collection.ts"/>
 var BD;
 (function (BD) {
     var APP;
@@ -2485,6 +2489,13 @@ var BD;
                 Res.bring = function (url) {
                     return Common.jqGetPromise(url);
                 };
+                Res.loadProduct = function (paths, productName, productLogics, productVisual) {
+                    // Forcing casting by first casting to 'any' - never do this!!
+                    var visual = Res.instantiateFromQualifiedName(paths.getProductQualifiedName(productVisual));
+                    var logics = Common.Collection.select(productLogics, function (productLogic, i) { return Res.instantiateFromQualifiedName(paths.getProductQualifiedName(productLogic)); });
+                    var product = new APP.Products.Product(productName, logics, visual);
+                    return Common.resolve(product);
+                };
                 Res.injectCss = function (url, doc) {
                     if (doc === void 0) { doc = document; }
                     if (doc.createStyleSheet) {
@@ -2497,7 +2508,18 @@ var BD;
                     return Common.resolve(null);
                 };
                 Res.injectScript = function (url) {
-                    return Common.NativeJSHelper.injectScriptPromise(url, 2);
+                    return Common.NativeJSHelper.injectScriptPromise(url);
+                };
+                Res.instantiateFromQualifiedName = function (qualifiedName) {
+                    var hirearchy = qualifiedName.split(".");
+                    var cursor = window;
+                    for (var i = 0; i < hirearchy.length; i++) {
+                        if (!(hirearchy[i] in cursor)) {
+                            throw Error("Cannot instantiate from qualified name. " + hirearchy[i] + " not found for path " + qualifiedName);
+                        }
+                        cursor = cursor[hirearchy[i]];
+                    }
+                    return new cursor;
                 };
                 return Res;
             })();
@@ -3417,10 +3439,10 @@ var BD;
         var Products;
         (function (Products) {
             var Product = (function () {
-                function Product(productName, logic, visual) {
+                function Product(productName, logics, visual) {
                     this.logic = null;
                     this.name = productName;
-                    this.logic = logic;
+                    this.logics = logics;
                     this.visual = visual;
                 }
                 /**
@@ -4261,6 +4283,140 @@ var BD;
         })(Data = APP.Data || (APP.Data = {}));
     })(APP = BD.APP || (BD.APP = {}));
 })(BD || (BD = {}));
+/// <reference path="../External/BloomFilter.d.ts"/>
+/// <reference path="AsyncHelper.ts"/>
+/// <reference path="../External/JSON3" />
+var BD;
+(function (BD) {
+    var APP;
+    (function (APP) {
+        var Common;
+        (function (Common) {
+            var BlackWhiteListHelper = (function () {
+                function BlackWhiteListHelper() {
+                }
+                /***
+                 * Breaks down the host into testable fragments in order of decreasing specificity: Entire host, Domain with suffix, Just domain.
+                 * @param host {string}
+                 * @returns {string[]}
+                 */
+                BlackWhiteListHelper.breakdownHost = function () {
+                    var host = document.location.host;
+                    var weird_cookie = 'weird_get_top_level_domain=cookie';
+                    var hostParts = host.split('.');
+                    for (var i = hostParts.length - 1; i >= 0; i--) {
+                        var partialDomain = hostParts.slice(i).join('.');
+                        document.cookie = weird_cookie + ';domain=.' + partialDomain + ';';
+                        if (document.cookie.indexOf(weird_cookie) > -1) {
+                            document.cookie = weird_cookie.split('=')[0] + '=;domain=.' + partialDomain + ';expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+                            var subdomain = hostParts.slice(0, i).join(".");
+                            var domain = hostParts[i];
+                            var suffix = hostParts.slice(i + 1).join(".");
+                            var prefix = document.location.protocol + "//";
+                            //return [prefix + subdomain + "." + domain + "." + suffix,  subdomain + "." + domain + "." + suffix, domain + "." + suffix, domain];
+                            return [subdomain + "." + domain + "." + suffix, domain + "." + suffix, domain];
+                        }
+                    }
+                    return [host];
+                };
+                BlackWhiteListHelper.blackWhiteMatch = function (domains, whiteUrl, blackUrl, verifyUrl) {
+                    var promises = {};
+                    if (whiteUrl != null)
+                        promises['white'] = Common.jqGetPromise(whiteUrl);
+                    if (blackUrl != null)
+                        promises['black'] = Common.jqGetPromise(blackUrl);
+                    return Common.namedWhen2(promises).then(function (results) {
+                        var whiteBloom = 'white' in results ? BlackWhiteListHelper.parseBloomFromResponse(results['white']) : null;
+                        var blackBloom = 'black' in results ? BlackWhiteListHelper.parseBloomFromResponse(results['black']) : null;
+                        // Initialize the chain with an undetermined result
+                        var chain = Common.resolve({ match: null, score: 0 });
+                        for (var i = 0; i < domains.length; i++) {
+                            var value = domains[i].toLowerCase();
+                            var closure = BlackWhiteListHelper.createTestMatchClosure(whiteBloom, blackBloom, verifyUrl, value);
+                            chain = chain.then(closure);
+                        }
+                        return chain.logPassthrough("bw result");
+                    });
+                };
+                BlackWhiteListHelper.parseBloomFromResponse = function (response) {
+                    var cleanResult = response.match(/\[.*\]/)[0];
+                    var bloomArray = JSON3.parse(cleanResult);
+                    return new BD.BloomFilter(bloomArray, 10);
+                };
+                BlackWhiteListHelper.createTestMatchClosure = function (whiteBloom, blackBloom, verifyUrl, value) {
+                    return (function (prevResult) {
+                        if (prevResult.score == 0) {
+                            return BlackWhiteListHelper.testMatch(whiteBloom, blackBloom, verifyUrl, value);
+                        }
+                        else {
+                            return Common.resolve(prevResult);
+                        }
+                    });
+                };
+                BlackWhiteListHelper.testMatch = function (whiteBloom, blackBloom, verifyUrl, value) {
+                    //console.log("Testing against " + value);
+                    var whiteBloomMatched = whiteBloom && whiteBloom.test(value);
+                    var blackBloomMatched = blackBloom && blackBloom.test(value);
+                    if (verifyUrl && (whiteBloomMatched || blackBloomMatched)) {
+                        var url = verifyUrl + encodeURIComponent(value);
+                        return Common.jqGetPromise(url).then(function (response) {
+                            var result = JSON3.parse(response);
+                            var found = ("found" in result) ? (result["found"] ? 2 : -1) : 0;
+                            if (found)
+                                APP.Logger.log("WBL for " + value + ": " + found);
+                            return { match: value, score: found };
+                        });
+                    }
+                    else if (whiteBloomMatched) {
+                        return Common.resolve({ match: value, score: 1 });
+                    }
+                    else if (blackBloomMatched) {
+                        return Common.resolve({ match: value, score: -1 });
+                    }
+                    else {
+                        return Common.resolve({ match: value, score: 0 });
+                    }
+                };
+                return BlackWhiteListHelper;
+            })();
+            Common.BlackWhiteListHelper = BlackWhiteListHelper;
+        })(Common = APP.Common || (APP.Common = {}));
+    })(APP = BD.APP || (BD.APP = {}));
+})(BD || (BD = {}));
+/// <reference path="../Common/BlackWhiteListHelper" />
+/// <reference path="../Common/Collection.ts" />
+var BD;
+(function (BD) {
+    var APP;
+    (function (APP) {
+        var Vertical;
+        (function (Vertical) {
+            var TicketsHelper = (function () {
+                function TicketsHelper() {
+                }
+                TicketsHelper.classifyByBlackWhiteList = function (context) {
+                    if (document.location.pathname.indexOf("/shop") == 0) {
+                        return APP.Common.resolve(1);
+                    }
+                    var domainsToCheck = APP.Common.BlackWhiteListHelper.breakdownHost();
+                    var isGoogle = APP.Common.Collection.contains(domainsToCheck, "google");
+                    if (isGoogle && document.location.href.indexOf("tbm=shop") != -1) {
+                        return APP.Common.resolve(1);
+                    }
+                    // Regex to be aligned with old method.
+                    if (context.host().toLowerCase().match(this.blackRegex)) {
+                        APP.Logger.log("Host matched black REGEX - Classifying as non-commerce");
+                        return APP.Common.resolve(-1);
+                    }
+                    return APP.Common.resolve(0);
+                };
+                TicketsHelper.blackRegex = /tube|lazada|shopzilla.|beso.|kelkoo.|orange.|clickjogos|gameforge|pole-emploi|infojobs|snap.do|(stockinvestingbasics|allmyvideos|laposte|megafilmeshd|vidspot).net|(collectivites|sweet|jeux|voila|bilansgratuits|habbol|vente).fr|(abril|terra|ig|blogspot|hotelurbano|uol).com.br|www.easymobility.co.uk|gov.br|wikipedia.org|(pricegrabber|spardeingeld|snapdo|speedbit|loopnet|stackoverflow|stackexchange|hulu|bloomberg|blogger|dartybox|alexa|baidu|cj|cnn|facebook|flickr|history|hotmail|imdb|imvu|linkedin|microsoft|msn|myspace|netflix|nytimes|politico|picasa|pinterest|rue89|salon|searchenginewatch|delta-search|sfgate|shutterfly|techcrunch|verizon|venturebeat|wired|yankodesign|yahoo|youtube|bing|vk|live|tumblr|ask|apple|roblox|411answers|tagged|nickjr|opposingviews|truste|adobe|breakfastdailynews|.avg|espn.go|.aol|pogo|pornhub|youporn|pron|youjizz|xnxx|marca|elpais|juegos|surveysresearchgroup|dofus|adopteunmec|unique|22find|nationzoom|sncf|privee|awesomehp|updateflashplayer|stocktradingcenters|empowernetwork|regionalhealthreview|diyfood|websurveycentral|\.att|news788|411source|pandora|hsselite|verizonwireless|internetautoguide|symantec|\.pch|mobile|nortonpro|pchealthboost|voipo|contenko|seaworldparks|entrepreneur|ratezip|game321|boostmobile|cabelas|specialk|globo|yepi|jogatina|4shared|globo|ojogos|tudogostoso|netcartas|disney|voeazul|cartoonnetwork|\.tam|viajanet|vagalume|jogosdemeninas|^as|\.as|atrapalo|elconfidencial|lavanguardia|forocoches|peliculasyonkis|logitravel|freakshare|elperiodico|iberia|filmaffinity|chaturbate|expansion|todotest|antena3|cincodias).com|(elmundo|rtve|lavozdegalicia|sport|publico|game|online|eldiariomontanes|elcomercio|\.hoy|\.abc|telepizza|europapress).es|paypal|cam4|888poker|filmesonlinegratis|google|.gov|qvo6|cam4|surveyservers|ask.fm|games.la|jeu.info/i;
+                return TicketsHelper;
+            })();
+            Vertical.TicketsHelper = TicketsHelper;
+        })(Vertical = APP.Vertical || (APP.Vertical = {}));
+    })(APP = BD.APP || (BD.APP = {}));
+})(BD || (BD = {}));
 /// <reference path="../Data/DataResult.ts" />
 /// <reference path="../Data/Deal.ts" />
 /// <reference path="../Common/Collection.ts" />
@@ -4273,6 +4429,7 @@ var BD;
 /// <reference path="../Data/SourceAndResults" />
 /// <reference path="../Common/DataSynchronizer.ts" />
 /// <reference path="../Products/IProductLogic" />
+/// <reference path="../Vertical/TicketsHelper" />
 var BD;
 (function (BD) {
     var APP;
@@ -4294,6 +4451,7 @@ var BD;
                 };
                 TicketsLogic.prototype.classify = function (context) {
                     return APP.Common.namedWaterfall([
+                        { name: "bwl", value: function () { return APP.Vertical.TicketsHelper.classifyByBlackWhiteList(context); } }
                     ], function (score) { return score != 0; }).alwaysThen(function (scoreAndSource, rej) {
                         return rej ? { name: rej.message, value: 0 } : scoreAndSource;
                     });
@@ -5667,6 +5825,16 @@ var BD;
             }
             BestDealApp.prototype.init = function (params, domain) {
                 var _this = this;
+                for (var key in params.products) {
+                    if (params.products.hasOwnProperty(key) && window['BD_SKIP_' + key]) {
+                        APP.Logger.info("Skip flag was set for product: [" + key + "]. It will be removed from the list of products.");
+                        delete params.products[key];
+                    }
+                }
+                if (APP.Common.Collection.getKeys(params.products).length == 0) {
+                    APP.Logger.info("No products exist. Possibly they were all skipped due to FO_SKIP flag.");
+                    return;
+                }
                 var paths = new APP.Context.Paths(domain);
                 var context = new APP.Context.AppContext(paths, params);
                 var externalRoot = context.paths().outerResourcesRoot() + "/";
@@ -5690,6 +5858,13 @@ var BD;
                 var contextPromise = APP.Context.DomainContext.initializePromise(appCotext, userSettingsPromise, suspenderPromise, iframeStore, null);
                 var contextAndProductPromises = {};
                 contextAndProductPromises["CTX"] = contextPromise;
+                for (var productName in appCotext.params().products) {
+                    var productDefs = appCotext.params().products[productName];
+                    for (var l = 0; l < productDefs.length; l++) {
+                        var productPromise = APP.Common.Res.loadProduct(appCotext.paths(), productName, productDefs[l].logic, productDefs[l].visual);
+                        contextAndProductPromises["PRODUCT_" + productName] = productPromise;
+                    }
+                }
                 APP.Common.namedWhen2(contextAndProductPromises).done(function (res) {
                     _this.continueWithContextAndProducts(res, freshGeneratedUUID);
                 }).fail(function (err) {
@@ -5707,32 +5882,124 @@ var BD;
                 //    t: dailyTimestamp, usertype: userType, hid: context.userSettings().uuid(),
                 //    partid: context.params().partnerCode, subid: context.params().subId
                 // }, 1.0, false);
-                var products = new APP.Products.Product("tickets", new APP.Products.TicketsLogic(), new APP.Products.IFrameRightSlider());
-                this.loadProduct(context, products);
-            };
-            BestDealApp.prototype.loadProduct = function (context, product) {
-                var _this = this;
-                APP.Logger.info("initializing Product");
-                var realestateSuspendId = APP.Products.VisualRealEstate[product.visual.realEstate()];
-                var isSuspended = context.suspender().isSuspended(realestateSuspendId);
-                var visualContext = new APP.Context.VisualContext(context, product.name, product.visual);
-                if (isSuspended) {
-                    APP.Logger.info("Realestate " + realestateSuspendId + " Is suspended. Product " + product.name + " will not be displayed");
-                    // todo: a visual context??
-                    // Logger.Analytics.notify(visualContext, Logger.Analytics.NO_SHOW, {'reason': 'suspended'}, 0);
-                    return;
+                var products = [];
+                for (var key in resources) {
+                    if (key.indexOf("PRODUCT") == 0)
+                        products.push(resources[key]);
                 }
+                this.selectProducts(context, products);
+            };
+            BestDealApp.prototype.selectProducts = function (context, products) {
+                var _this = this;
+                var productNames = APP.Common.Collection.select(products, function (p) { return p.name; }).join(",");
+                APP.Logger.log("loaded product code for " + productNames);
+                // Round up classification promises from product logics
+                var classificationPromises = {};
+                for (var p = 0; p < products.length; p++) {
+                    var product = products[p];
+                    var visualContext = new APP.Context.VisualContext(context, product.name, product.visual);
+                    // Check suspension by realestate (single visual and therefore single realestate per visual)
+                    var realestateSuspendId = APP.Products.VisualRealEstate[product.visual.realEstate()];
+                    var isSuspended = context.suspender().isSuspended(realestateSuspendId);
+                    if (isSuspended) {
+                        APP.Logger.info("Realestate " + realestateSuspendId + " Is suspended. Product " + product.name + " will not be displayed");
+                        continue;
+                    }
+                    for (var l = 0; l < product.logics.length; l++) {
+                        var logic = product.logics[l];
+                        var lvContext = new APP.Context.LVContext(context, product.name, logic, product.visual);
+                        classificationPromises[logic.flag()] = logic.classify(lvContext).logPassthrough("Logic classification score for " + logic.flag());
+                    }
+                }
+                // Join all logic classification promises.
+                var framedLogicsPromise = APP.Common.namedWhen2(classificationPromises).fail(function (err) {
+                    APP.Logger.error("Failed classification: " + err.message);
+                    //SharedApp.injectAlt(context, "fail-cls");
+                });
+                // Round up all products with positive classifying logics
+                var framedProductsPromise = framedLogicsPromise.then(function (results) {
+                    var logicQualifyingProducts = [];
+                    for (var p = 0; p < products.length; p++) {
+                        var product = products[p];
+                        var visualContext = new APP.Context.VisualContext(context, product.name, product.visual);
+                        // Check suspension by realestate (single visual and therefore single realestate per visual)
+                        var realestateSuspendId = APP.Products.VisualRealEstate[product.visual.realEstate()];
+                        var isSuspended = context.suspender().isSuspended(realestateSuspendId);
+                        if (isSuspended)
+                            continue;
+                        var highestScoringLogic = null;
+                        var topLogicScore = 0;
+                        var topScoreReason = null;
+                        var validLogics = [];
+                        for (var l = 0; l < product.logics.length; l++) {
+                            var logic = product.logics[l];
+                            var logicResult = results[logic.flag()];
+                            if (logicResult) {
+                                var logicScore = logicResult.value;
+                                var scoreReason = logicResult.name;
+                                if (logicScore > 0) {
+                                    validLogics.push(logic);
+                                }
+                                if (topScoreReason == null || logicScore > topLogicScore) {
+                                    topLogicScore = logicScore;
+                                    highestScoringLogic = logic;
+                                    topScoreReason = scoreReason;
+                                }
+                            }
+                            else {
+                                APP.Logger.log("Skipping logic " + logic.flag() + ". Did not reach classification");
+                            }
+                        }
+                        if (topLogicScore <= 0) {
+                            APP.Logger.log("Skipping product " + product.name + ". Top logic classification returned " + topLogicScore + " with reason " + topScoreReason);
+                        }
+                        else {
+                            // IMPORTANT: only keep the qualifying logics in the product.
+                            product.logics = validLogics;
+                            logicQualifyingProducts.push({ product: product, score: topLogicScore });
+                        }
+                    }
+                    return logicQualifyingProducts;
+                });
+                // Select products based on classification scores and clashing realestate
+                var selectedProductsPromise = framedProductsPromise.then(function (productScores) { return APP.Common.RealEstateHelper.resolveProductsByRealEstate(context, productScores); }).fail(function (err) {
+                    APP.Logger.error("Failed realestate resolution: " + err.message);
+                });
+                selectedProductsPromise.then(function (selectedproducts) {
+                    // We set selected products so that they can be removed on refresh-less url change
+                    // this.selectedProducts = selectedproducts;
+                    if (selectedproducts.length == 0) {
+                        APP.Logger.info("FO complete: no products selected.");
+                    }
+                    else {
+                        _this.loadProducts(context, selectedproducts);
+                    }
+                }).fail(function (err) {
+                    APP.Logger.error("Failed selected product initialization: " + err.message);
+                });
+            };
+            BestDealApp.prototype.loadProducts = function (context, products) {
+                var _this = this;
+                var productNames = APP.Common.Collection.select(products, function (p) { return p.name; }).join();
+                APP.Logger.info("initializing products " + productNames);
                 var sync = new APP.Common.DataSynchronizer();
-                var dataPromise = this.obtainProductData(context, product, sync).fail(function (err) {
-                    APP.Logger.error("Failed retrieving data for product " + product.name + ": " + err.message);
+                var displayProductsPromises = APP.Common.Collection.select(products, function (product) {
+                    var visualContext = new APP.Context.VisualContext(context, product.name, product.visual);
+                    var dataPromise = _this.obtainProductData(context, product, sync).fail(function (err) {
+                        APP.Logger.error("Failed retrieving data for product " + product.name + ": " + err.message);
+                    });
+                    var visualResourcesPromise = APP.Common.namedWhen2(product.visual.declareResourcesPromise(visualContext)).fail(function (err) {
+                        APP.Logger.error("Failed retrieving visual resources for product " + product.name + ": " + err.message);
+                    });
+                    return APP.Common.namedWhen2({ 'data': dataPromise, 'visres': visualResourcesPromise }).then(function (results) {
+                        return _this.displayProduct(visualContext, product, results['data'], results['visres']);
+                    }).done(function () {
+                        APP.Logger.log("Product " + product.name + " displayed");
+                    });
                 });
-                var visualResourcesPromise = APP.Common.namedWhen2(product.visual.declareResourcesPromise(visualContext)).fail(function (err) {
-                    APP.Logger.error("Failed retrieving visual resources for product " + product.name + ": " + err.message);
-                });
-                return APP.Common.namedWhen2({ 'data': dataPromise, 'visres': visualResourcesPromise }).then(function (results) {
-                    return _this.displayProduct(visualContext, product, results['data'], results['visres']);
-                }).done(function () {
-                    APP.Logger.log("Product " + product.name + " displayed");
+                APP.Common.typedWhen(displayProductsPromises).always(function () {
+                    APP.Logger.info("BD complete: " + productNames);
+                    APP.Logger.timeEnd("BD end to end");
                 });
             };
             BestDealApp.prototype.obtainProductData = function (appContext, product, sync) {

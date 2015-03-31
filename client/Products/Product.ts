@@ -8,12 +8,12 @@ module BD.APP.Products {
         name:string;
 
         visual:IProductVisual;
-
         logic:IProductLogic = null;
+        logics:IProductLogic[]  ;
 
-        constructor(productName: string, logic: IProductLogic, visual: IProductVisual) {
+        constructor(productName: string, logics: IProductLogic[], visual: IProductVisual) {
             this.name = productName;
-            this.logic = logic;
+            this.logics = logics;
             this.visual = visual;
         }
 

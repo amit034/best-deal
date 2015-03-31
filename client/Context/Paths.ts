@@ -32,6 +32,9 @@ module BD.APP.Context {
             return "//" + this._domain + "";
         }
 
+        getProductQualifiedName(productComponentName:string){
+            return "BD.APP.Products." + productComponentName;
+        }
 
     }
 }

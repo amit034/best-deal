@@ -11,7 +11,7 @@
 /// <reference path="../Data/SourceAndResults" />
 /// <reference path="../Common/DataSynchronizer.ts" />
 /// <reference path="../Products/IProductLogic" />
-
+/// <reference path="../Vertical/TicketsHelper" />
 
 module BD.APP.Products {
     import Promise = BD.APP.Common.Promise;
@@ -46,6 +46,8 @@ module BD.APP.Products {
 
         classify(context:Context.IAppContext):Common.Promise<Common.INamedValue<number>> {
             return Common.namedWaterfall([
+
+                {name: "bwl", value: () => Vertical.TicketsHelper.classifyByBlackWhiteList(context)}
 
             ], (score:number) => score != 0).alwaysThen((scoreAndSource, rej) => {
                 return rej ? {name: rej.message, value: 0} : scoreAndSource;
