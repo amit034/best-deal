@@ -52,15 +52,19 @@ module BD.APP.Products {
         }
 
 
-        draw(product:Products.Product, result:Data.DataResult, resources:{[index:string]: string}):Common.Promise<any> {
+        draw(product:Products.Product, resultSets:Data.DataResultSet, resources:{[index:string]: string}):Common.Promise<any> {
 
 
-            var dealsResult = <Data.PlainDataResult<Data.Deal>>result;
+            var dealsResult = <Data.PlainDataResult<Data.Deal>>resultSets["CommerceDeals"];
 
             var deals:Data.Deal[] = dealsResult ? dealsResult.data : null;
             var dealsContext:Context.LVContext = dealsResult ? dealsResult.context : null;
 
+			 var couponsResult = <Data.PlainDataResult<Data.Coupon>>resultSets["Coupons"];
 
+            var coupons:Data.Coupon[] = couponsResult ? couponsResult.data : null;
+            var couponsContext:Context.LVContext = couponsResult ? couponsResult.context : null;
+			
             var iframeString = resources["container"];
             var iframeElement = $(iframeString);
             iframeElement.addClass("fo-right-container-frame");
@@ -106,7 +110,7 @@ module BD.APP.Products {
                 var suspendIdentifier = Products.VisualRealEstate[this.realEstate()];
 
 
-                var model = new Model.TicketsModel(dealsContext , deals, dealsContext,suspendIdentifier, onClose);
+                var model = new Model.TicketsModel(dealsContext , deals, dealsContext,coupons,couponsContext,suspendIdentifier, onClose);
 
                 // Visual composition and injection
                 var jqElement:JQuery = $(htmlString).addClass(rootClass);

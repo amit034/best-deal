@@ -1,0 +1,72 @@
+/// <reference path="GenericOffersModel" />
+
+module BD.APP.Model {
+
+    export interface ICoupon extends IOffer {
+        code?:string;
+        revealed:boolean;
+        isDirect: boolean;
+        title: string;
+    }
+
+
+    export class CouponsModel<T extends ICoupon> extends ModelBase {
+
+
+
+        offers:CouponModel<T>[] = [];
+        context:Context.LVContext;
+
+        constructor(context:Context.LVContext, offers:T[]) {
+            super();
+
+            var offerModels = Common.Collection.select(offers, o => new CouponModel<T>(context, o));
+            this.offers = offerModels;
+
+            this.context = context;
+        }
+    }
+
+    export class CouponModel<T extends ICoupon> extends GenericOfferModel<T> {
+
+        isRevealed:KnockoutObservable<boolean> = ko.observable(false);
+
+
+        constructor(context:Context.LVContext, offer:T) {
+            super(context, offer);
+
+            this.isRevealed(offer.revealed);
+        }
+
+        onClick(model:CouponModel<T>, event:Event):void {
+            // IMPORTANT: A copy of many of these actions occurs in GenericOfferModel (the super). Reflect changes there
+
+            if (event) event.preventDefault();
+
+            if (!model.clickNotified) {
+                model.clickNotified = true;
+                //Logger.Analytics.notify(model.context, Logger.Analytics.CLICK, { 'p': model.offer.part });
+
+                if (model.offer.onClick) model.offer.onClick();
+            }
+
+            if (model.offer.isDirect) {
+                model.windowOpen(model.url, '_blank');
+
+               
+            }
+            else if (!model.offer.revealed) {
+
+                // window.open used to be here. Instead we create an iframe with the src
+                var iframeElement:JQuery = $('<iframe width="0" height="0"></iframe>');
+                iframeElement.attr('src', model.url);
+                Common.VisualHelper.appendToBody(iframeElement);
+
+               
+                model.isRevealed(true);
+            }
+        }
+
+    }
+
+}

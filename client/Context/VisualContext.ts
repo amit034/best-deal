@@ -10,7 +10,7 @@ module BD.APP.Context {
 
 
         constructor(appContext:IAppContext, productName:string, visual: { flag():string }) {
-            super(appContext, appContext.userSettings(), appContext.suspender(), appContext.iframe(), appContext.fnWindow());
+            super(appContext,appContext.countryCode(), appContext.userSettings(), appContext.suspender(), appContext.iframe(), appContext.fnWindow());
             this.productName = productName;
             this.visual = visual;
 

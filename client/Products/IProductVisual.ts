@@ -16,7 +16,7 @@ module BD.APP.Products {
         determineNeededItemCount(context:Context.VisualContext): number;
 
         declareResourcesPromise(context:Context.VisualContext):{[index:string]: Common.Promise<any>};
-        draw(product:Product, result:Data.DataResult, resources:{[index:string]: string}):Common.Promise<any>;
+        draw(product:Product, result:Data.DataResultSet, resources:{[index:string]: string}):Common.Promise<any>;
 
 
     }

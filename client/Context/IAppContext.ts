@@ -9,8 +9,9 @@ module BD.APP.Context {
         userSettings():Common.IUserStore;
         suspender():Common.ISuspender;
         scraper():Common.IPageScraper;
-        iframe():Common.IFrameStore;
         fnWindow():Window;
+        iframe():Common.IFrameStore;
+        countryCode():string
     }
 
 

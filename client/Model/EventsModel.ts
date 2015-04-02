@@ -14,6 +14,8 @@ module BD.APP.Model {
     }
     export interface IEvent extends IBanner{
         prices: IPricing;
+		title:string;
+        secondLine:string;
 
     }
 

@@ -5,8 +5,7 @@
 module BD.APP.Model {
 
     export interface IBanner  {
-        title:string;
-        secondLine:string;
+        
         url:string;
         keywords:string;
         onClick?:() => void;

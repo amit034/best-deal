@@ -6,3 +6,10 @@ client/.idea/modules.xml
 client/.idea/scopes/scope_settings.xml
 client/.idea/vcs.xml
 client/.idea/workspace.xml
+
+client/*.js
+client/Bootstrap/*.js
+client/Common/*.js
+client/Context/*.js
+client/Product/*.js
+client/Data/*.js

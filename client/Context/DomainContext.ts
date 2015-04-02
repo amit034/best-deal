@@ -8,10 +8,13 @@
 /// <reference path="../Common/IFrameStore.ts" />
 /// <reference path="../Common/DefaultPageScraper.ts" />
 /// <reference path="../Common/Promise.ts" />
+/// <reference path="../Common/CountryHelper"/>
+
 module BD.APP.Context {
 
     export class DomainContext extends AppContext implements IAppContext {
 
+        private _countryCode:string;
         private _userSettings:Common.IUserStore;
         private _suspender:Common.ISuspender;
         private _scraper:Common.IPageScraper;
@@ -19,6 +22,7 @@ module BD.APP.Context {
 
         private _fnWindow:Window;
 
+        countryCode():string { return this._countryCode; }
 
         userSettings():Common.IUserStore { return this._userSettings; }
         suspender():Common.ISuspender {  return this._suspender; }
@@ -26,7 +30,7 @@ module BD.APP.Context {
         iframe():Common.IFrameStore {  return this._iframe; }
         fnWindow():Window { return this._fnWindow }
 
-        constructor(baseContext:IBaseContext,  userSettings:Common.IUserStore, suspender:Common.ISuspender, iframe:Common.IFrameStore, fnWindow:Window) {
+        constructor(baseContext:IBaseContext, countryCode:string,  userSettings:Common.IUserStore, suspender:Common.ISuspender, iframe:Common.IFrameStore, fnWindow:Window) {
             super(baseContext.paths(), baseContext.params());
 
 
@@ -42,12 +46,15 @@ module BD.APP.Context {
         static initializePromise(baseContext:IBaseContext, userSettingsPromise:Common.Promise<Common.IUserStore>, suspenderPromise:Common.Promise<Common.ISuspender>,
                                  iframe:Common.IFrameStore, fnWindow:Window):Common.Promise<DomainContext> {
 
-            return Common.namedWhen2({'US': userSettingsPromise, 'SU': suspenderPromise}).then((res) => {
+            var getCountryPromise = Common.CountryHelper.getCountryPromise(baseContext);
 
+
+            return Common.namedWhen2({'CC': getCountryPromise, 'US': userSettingsPromise, 'SU': suspenderPromise}).then((res) => {
+                var countryCode:string = res['CC'];
                 var userSettings:Common.IUserStore = res['US'];
                 var suspender:Common.ISuspender = res['SU'];
 
-                return new DomainContext(baseContext, userSettings, suspender, iframe, fnWindow);
+                return new DomainContext(baseContext, countryCode, userSettings, suspender, iframe, fnWindow);
             });
         }
 

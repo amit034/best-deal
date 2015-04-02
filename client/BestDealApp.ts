@@ -10,6 +10,7 @@
 /// <reference path="Common/DefaultSuspender.ts" />
 /// <reference path="Products/Product.ts" />
 /// <reference path="Products/TicketsLogic.ts" />
+/// <reference path="Products/GamblingLogic.ts" />
 /// <reference path="Products/IFrameRightSlider.ts" />
 /// <reference path="External/JSON3.d.ts" />
 /// <reference path="AppParams.ts" />
@@ -277,25 +278,31 @@ module BD.APP {
         }
 
 
-        obtainProductData(appContext:Context.IAppContext, product:Products.Product, sync:Common.DataSynchronizer):Common.Promise<Data.DataResult> {
+        obtainProductData(appContext:Context.IAppContext, product:Products.Product, sync:Common.DataSynchronizer):Common.Promise<{[index:string]: Data.DataResult}> {
 
 
-                var logic = product.logic;
-                var context = new Context.LVContext(appContext, product.name, logic, product.visual);
-                var neededItemCount = product.visual.determineNeededItemCount(context);
+                var productDataPromises:{[index:string]: Common.Promise<Data.DataResult>} = {};
 
-                return logic.scrapeAndObtainData(context, neededItemCount, sync).then(result => {
+				for (var i = 0; i < product.logics.length; i++) {
+					var logic = product.logics[i];
+					var context = new Context.LVContext(appContext, product.name, logic, product.visual);
+					var neededItemCount = product.visual.determineNeededItemCount(context);
 
-                    return result;
-                });
+					var logicDataPromise =  logic.scrapeAndObtainData(context, neededItemCount, sync).then(result => {
 
+						return result;
+					});
+					productDataPromises[logic.dataKey()] = logicDataPromise;
+				}
+				
+				 return Common.namedWhen3(productDataPromises);
 
         }
 
-        displayProduct(visualContext:Context.VisualContext, product:Products.Product, data:Data.DataResult, visualResources:{[index:string]: string}):Common.Promise<any> {
+        displayProduct(visualContext:Context.VisualContext, product:Products.Product, data:{[index:string]: Data.DataResult}, visualResources:{[index:string]: string}):Common.Promise<any> {
 
 
-            var hasAnyResults:boolean =  data.hasData();
+            var hasAnyResults:boolean =  Common.Collection.hashSum(data, (key:string, value:Data.DataResult) => value.hasData() ? 1 : 0) > 0;
             var drawPromise:Common.Promise<any> = null;
 
             if (!hasAnyResults) {
