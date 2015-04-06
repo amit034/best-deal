@@ -33,7 +33,8 @@ module BD.APP.Data {
 
     export interface DealApiResult{
         title:string;
-        secondLine:string;
+        merchant: string;
+        merchantImage: string;
         url:string;
         onClick?:() => void;
         score:number;
@@ -148,7 +149,8 @@ module BD.APP.Data {
 
             var deals = Common.Collection.of(eventResult).orderByDesc(o => o.score).select((eventResult:EventApiResult, index:number) => {
                 var deal:Data.Event = { title:eventResult.title,
-                secondLine:eventResult.secondLine,
+                merchant: eventResult.merchant,
+                merchantImage: eventResult.merchantImage,
                 url:eventResult.url,
                 image: eventResult.image,
                 date : eventResult.date,
@@ -161,13 +163,14 @@ module BD.APP.Data {
             return deals.toArray();
 
         }
-        static dealsFromPerformers(performers:DealApiResult[]):Data.Performares[] {
+        static dealsFromPerformers(performers:DealApiResult[]):Data.Performers[] {
 
 
             var deals = Common.Collection.of(performers).orderByDesc(o => o.score).select((performers:PerformersApiResult, index:number) => {
-                var deal:Data.Performares = {
+                var deal:Data.Performers = {
                     title: performers.title,
-                    secondLine:performers.secondLine,
+                    merchant: performers.merchant,
+                    merchantImage: performers.merchantImage,
                     url:performers.url,
                     keywords:performers.keywords,
                     image: performers.image,

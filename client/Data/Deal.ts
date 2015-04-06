@@ -2,10 +2,11 @@ module BD.APP.Data {
 
     export interface Deal{
         title:string;
-        secondLine:string;
         url:string;
         keywords:string;
         onClick?:() => void;
+        merchant: string;
+        merchantImage: string;
     }
     export interface Pricing{
     listing:number;
@@ -25,7 +26,7 @@ module BD.APP.Data {
 
     }
 
-    export interface Performares extends Deal {
+    export interface Performers extends Deal {
         image:string;
         images : Images;
     }

@@ -71,7 +71,8 @@ module BD.APP.Products {
                 if (deals.length == 0){
                     deals.push({
                         title: null,
-                        secondLine:null,
+                        merchant: "Compare with 20+ websites for the best price",
+                        merchantImage: null,
                         url:"https://seatgeek.com/",
                         keywords:"",
                         image: null,
