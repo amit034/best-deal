@@ -20,13 +20,13 @@
                 <div class="fo-deals-header fo-header" data-bind="html: strings['deals_header']">
 
                 </div>
-                <div class="fo-scroll-btn fo-scroll-up fa fa-chevron-up" data-scroll-step="-1" data-bind="visible:bannersModel.banners.length > 4"></div>
+                <div class="fo-scroll-btn fo-scroll-up fa fa-chevron-up" data-scroll-step="-1" data-bind="visible:bannersModel.banners.length > 2"></div>
                 <div class="fo-list-wrapper">
                     <ul class="fo-list">
                         <!-- ko foreach: { data: bannersModel.banners }-->
                         <li>
                             <!--ko if: banner.title-->
-                            <!--<a data-bind="attr: {href: banner.url}" target="_self">-->
+                            <!--<a data-bind="attr: {href: banner.url}" target="_top">-->
                                 <div class="fo-item" buy-text="hi there" data-bind="attr: {'buy-text': banner.prices ? $parent.strings['buy']: $parent.strings['compare']}, event: { click:onClick, mouseover: hoverStart, mouseout: hoverEnd }">
 
                                     <div class="fo-thumb" data-bind="style: {backgroundImage: 'url(\'' + banner.image + '\')'}"></div>
@@ -52,7 +52,7 @@
                             <!-- /ko -->
 
                             <!--ko if: !banner.title-->
-                            <!--<a data-bind="attr: {href: banner.url}" target="_self">-->
+                            <!--<a data-bind="attr: {href: banner.url}" target="_top">-->
                             <div class="fo-item" buy-text="hi there" data-bind="attr: {'buy-text': $parent.strings['compare']}, event: { click:onClick, mouseover: hoverStart, mouseout: hoverEnd }">
 
                                 <div class="fo-title elps" data-bind="text: 'Compare with Best Best Deals'"></div>
@@ -63,10 +63,30 @@
 
                         </li>
                         <!-- /ko -->
+						
+						<!-- ko foreach: { data: coupons.offers }-->
+                        <li>
+                            <!--ko if: banner.script-->
+                            <script data-bind="attr: {src: banner.script}"></script>
+                            <!-- /ko -->
+							<!--ko if: banner.link-->
+							<a data-bind="attr: {href: banner.link}">
+								<!--ko if: banner.image-->
+								<img data-bind="attr: {src: banner.image}"></img>
+								<!-- /ko -->
+							</a>                           
+                            <!-- /ko -->
+							<a data-bind="attr: {href: banner.link}">
+								
+								<img data-bind="attr: {src: banner.image}"></img>
+								
+							</a>           
+                        </li>
+						<!-- /ko -->
                     </ul>
 
                 </div>
-                <div class="fo-scroll-btn fo-scroll-down fa fa-chevron-down"  data-scroll-step="1" data-bind="visible:bannersModel.banners.length > 4"></div>
+                <div class="fo-scroll-btn fo-scroll-down fa fa-chevron-down"  data-scroll-step="1" data-bind="visible:bannersModel.banners.length > 2"></div>
             </div>
 
 

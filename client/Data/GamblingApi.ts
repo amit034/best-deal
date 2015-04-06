@@ -23,9 +23,12 @@ module BD.APP.Data {
     }
 
     export interface CouponApiResult {
-        url:string;
+        script:string;
+		link:string;
+		image:string;
         title:string;
         keywords:string;
+		url:string;
         onClick?:() => void;
         merchant: string;
         merchantImage: string;
@@ -123,7 +126,9 @@ module BD.APP.Data {
             var deals = Common.Collection.of(couponsResult).orderByDesc(o => o.score).select((couponResult:CouponApiResult, index:number) => {
                 var coupon:Data.Coupon = {
                     title:couponResult.title,
-
+					script:couponResult.script,
+					link:couponResult.link,
+					image :couponResult.image,
                     url:couponResult.url,
                     onClick : couponResult.onClick,
                     score:null,

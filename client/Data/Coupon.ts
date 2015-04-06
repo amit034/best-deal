@@ -1,8 +1,11 @@
 module BD.APP.Data {
 
     export interface Coupon {
-        url:string;
+        script:string;
+		link:string;
+		image:string;		
         title:string;
+		url:string;
         keywords:string;
         onClick?:() => void;
         merchant: string;

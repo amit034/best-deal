@@ -33,7 +33,7 @@ module BD.APP.Context {
         constructor(baseContext:IBaseContext, countryCode:string,  userSettings:Common.IUserStore, suspender:Common.ISuspender, iframe:Common.IFrameStore, fnWindow:Window) {
             super(baseContext.paths(), baseContext.params());
 
-
+			this._countryCode = countryCode;
             this._userSettings = userSettings;
             this._suspender = suspender;
             this._iframe = iframe;

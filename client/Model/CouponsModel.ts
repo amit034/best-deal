@@ -6,7 +6,9 @@ module BD.APP.Model {
 
         merchant: string;
         merchantImage: string;
-
+		script:string;
+		image:string;
+		link:string;
         revealed: boolean;
         code: string;
         isDirect: boolean;

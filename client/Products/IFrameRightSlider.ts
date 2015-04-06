@@ -65,6 +65,7 @@ module BD.APP.Products {
             var coupons:Data.Coupon[] = couponsResult ? couponsResult.data : null;
             var couponsContext:Context.LVContext = couponsResult ? couponsResult.context : null;
 			
+			var context = dealsContext || couponsContext;
             var iframeString = resources["container"];
             var iframeElement = $(iframeString);
             iframeElement.addClass("fo-right-container-frame");
@@ -75,7 +76,7 @@ module BD.APP.Products {
 
             return Common.wait(100).then(() => {
 
-                var css1 = $('<link rel="stylesheet" href="' + dealsContext.paths().staticContentRoot() + '/Partials/iframeRightSlider.css">');
+                var css1 = $('<link rel="stylesheet" href="' + context.paths().staticContentRoot() + '/Partials/iframeRightSlider.css">');
                 $(iframe.contentDocument.head).append(css1);
 
 
@@ -110,7 +111,7 @@ module BD.APP.Products {
                 var suspendIdentifier = Products.VisualRealEstate[this.realEstate()];
 
 
-                var model = new Model.TicketsModel(dealsContext , deals, dealsContext,coupons,couponsContext,suspendIdentifier, onClose);
+                var model = new Model.TicketsModel(context , deals, dealsContext,coupons,couponsContext,suspendIdentifier, onClose);
 
                 // Visual composition and injection
                 var jqElement:JQuery = $(htmlString).addClass(rootClass);

@@ -185,7 +185,7 @@ module BD.APP.Products {
             });
 
             var wordCounts = Common.WordUtils.countWords(filteredWords);
-
+			
             return wordCounts;
         }
 

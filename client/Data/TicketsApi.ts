@@ -124,15 +124,16 @@ module BD.APP.Data {
 
         static queryFromData(context:Context.IAppContext, data:TicketsApiRequestData):QueryData {
 
-
+				
             var formattedWordCounts = data.wordCounts.select((x:Common.Keyed<number>) => {
                 return {"w": x.key, "c": x.value};
             }).toArray();
+			
+			var wordsCollection:Common.Collection<any> = new Common.Collection<any>(formattedWordCounts);
+			var sortedWordsCollection = wordsCollection.orderByDesc(e => e.c).toArray();
+            var allWordString:string = Common.Collection.select(sortedWordsCollection, x => x.w).join(" ");
 
-
-            var allWordString:string = Common.Collection.select(formattedWordCounts, x => x.w).join(" ");
-
-            var res = {kwc: formattedWordCounts, t: allWordString, clientPrice: data.price, source: 'api-' + data.source};
+            var res = {kwc: sortedWordsCollection, t: allWordString, clientPrice: data.price, source: 'api-' + data.source};
             return res;
 
 
