@@ -41,12 +41,8 @@
                                     </div>
 
                                     <div class="fo-title elps" data-bind="text: banner.title"></div>
-                                    <!-- ko if: banner.prices  -->
-                                     <div class="fo-price" data-bind="html: banner.prices.lowest? banner.prices.lowest + '$' : '' "></div>
-                                    <!-- /ko -->
-                                    <!-- ko if: banner.date -->
-                                    <div class="fo-merchant elps" data-bind="html: banner.date"></div>
-                                    <!-- /ko -->
+                                    <div class="fo-merchant elps" data-bind="html: banner.merchant"></div>
+                                   
                                 </div>
                             <!--</a>-->
                             <!-- /ko -->
@@ -72,13 +68,12 @@
 							<!--ko if: banner.link-->
 							<a data-bind="attr: {href: banner.link}">
 								<!--ko if: banner.image-->
-								<img data-bind="attr: {src: banner.image}"></img>
+								<img data-bind="attr: {src: banner.image}"/>
 								<!-- /ko -->
 							</a>                           
                             <!-- /ko -->
 							<a data-bind="attr: {href: banner.link}">
-								
-								<img data-bind="attr: {src: banner.image}"></img>
+								<img data-bind="attr: {src: banner.image}"/>
 								
 							</a>           
                         </li>
