@@ -20,7 +20,7 @@ module BD.APP.Model {
 
         hasDeals = ko.computed(() => this.bannersModel && this.bannersModel.banners.length);
 	
-        dealScroll = ko.computed(() => this.bannersModel && this.bannersModel.banners.length > 3);
+        dealScroll = ko.computed(() => this.bannersModel && this.bannersModel.banners.length > 2);
 		
 		
         coupons:CouponsModel<Data.Coupon>;

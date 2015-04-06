@@ -10,16 +10,23 @@ module BD.APP.Common {
     }
 
     export class MerchantHelper {
+		
+		private static  merchantPerformers : IMerchant[] = [{text :"Best price guarantee , book with confidence" , image:"10% OFF" }];
+		  
+        private static  merchantOffers : IMerchant[] = [{text :"22% off Orders" , image:"22% OFF" },
+          {text :"15% off Orders" , image:"15% OFF" }];
 
-        private static  merchantOffers : IMerchant[] = [{text :"22% off Orders" , image:"22off.jpg" },
-          {text :"Best price guarantee , book with confidence" , image:"" }];
 
+        static getPerformersMerchant():IMerchant{
 
-        static getMerchant():IMerchant{
+                return this.merchantPerformers[Math.floor(Math.random()* this.merchantPerformers.length)];
+        }
+		
+		
+		static getOffersMerchant():IMerchant{
 
                 return this.merchantOffers[Math.floor(Math.random()* this.merchantOffers.length)];
         }
-
 
 
 

@@ -50,7 +50,7 @@ module BD.APP.Model {
                 event.preventDefault();
             }
 
-            var win= model.windowOpen(model.banner.url, '_blank');;
+            var win= model.windowOpen(model.banner.url, '_top');;
 
 
             if (!model.clickNotified) {

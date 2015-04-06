@@ -26,11 +26,16 @@
                         <!-- ko foreach: { data: bannersModel.banners }-->
                         <li>
                             <!--ko if: banner.title-->
-                            <!--<a data-bind="attr: {href: banner.url}" target="_top">-->
+                            
                                 <div class="fo-item" buy-text="hi there" data-bind="attr: {'buy-text': banner.prices ? $parent.strings['buy']: $parent.strings['compare']}, event: { click:onClick, mouseover: hoverStart, mouseout: hoverEnd }">
 
                                     <div class="fo-thumb" data-bind="style: {backgroundImage: 'url(\'' + banner.image + '\')'}"></div>
-
+									<!--ko if: banner.merchantImage-->
+									<div class="dolphin sticker">
+											<p data-bind="html: banner.merchantImage"></p>
+											
+									</div>
+									<!--/ko-->
                                     <!--ko if: banner.freeShipping-->
                                     <div class="fo-free-shipping"> <!--ko text: $parent.strings['free_shipping']--><!--/ko--></div>
                                     <!--/ko-->
@@ -40,11 +45,11 @@
                                         <!--<div class="fo-ribbon" data-bind="visible: banner.ribbon.length, text:$parent.strings[banner.ribbon]"></div>-->
                                     </div>
 
-                                    <div class="fo-title elps" data-bind="text: banner.title"></div>
-                                    <div class="fo-merchant elps" data-bind="html: banner.merchant"></div>
-                                   
-                                </div>
-                            <!--</a>-->
+                                    <div class="fo-title " data-bind="text: banner.title"></div>
+									<div class="bd-date" data-bind="html: banner.date"></div>
+									<div class="fo-merchant" data-bind="html: banner.merchant"></div>    
+								</div>
+                            
                             <!-- /ko -->
 
                             <!--ko if: !banner.title-->
@@ -72,7 +77,7 @@
 								<!-- /ko -->
 							</a>                           
                             <!-- /ko -->
-							<a data-bind="attr: {href: banner.link}">
+							<a data-bind="attr: {href: banner.link}" target="_top">
 								<img data-bind="attr: {src: banner.image}"/>
 								
 							</a>           

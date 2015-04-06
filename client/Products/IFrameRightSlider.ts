@@ -79,7 +79,6 @@ module BD.APP.Products {
                 var css1 = $('<link rel="stylesheet" href="' + context.paths().staticContentRoot() + '/Partials/iframeRightSlider.css">');
                 $(iframe.contentDocument.head).append(css1);
 
-
                 var htmlString = resources["html"];
                 var rootClass = this.getMainCssClass();
 
@@ -87,7 +86,7 @@ module BD.APP.Products {
                 var syncToPage = false;
                 var scrollArrows =  true;
                 var autoScroll =  0;
-                var scrollIndependent = false;
+                var scrollIndependent = true;
                 var peekaboo = false;
 
                 var displayHandlers:DisplayHandlers.IDisplayHandler[] = [

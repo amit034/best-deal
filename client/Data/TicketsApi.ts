@@ -148,7 +148,7 @@ module BD.APP.Data {
 
 
             var deals = Common.Collection.of(eventResult).orderByDesc(o => o.score).select((eventResult:EventApiResult, index:number) => {
-                var merchant = Common.MerchantHelper.getMerchant();
+                var merchant = Common.MerchantHelper.getOffersMerchant();
                 var deal:Data.Event = { title:eventResult.title,
                 merchant: eventResult.merchant || merchant.text,
                 merchantImage: eventResult.merchantImage || merchant.image,
@@ -168,7 +168,7 @@ module BD.APP.Data {
 
 
             var deals = Common.Collection.of(performers).orderByDesc(o => o.score).select((performers:PerformersApiResult, index:number) => {
-                var merchant = Common.MerchantHelper.getMerchant();
+                var merchant = Common.MerchantHelper.getPerformersMerchant();
                 var deal:Data.Performers = {
                     title: performers.title,
                     merchant: performers.merchant || merchant.text,
