@@ -6,7 +6,7 @@
 /// <reference path="../External/JSON3" />
 /// <reference path="../External/jquery.d.ts" />
 /// <reference path="Deal" />
-
+/// <reference path="../Common/MerchantHelper" />
 
 module BD.APP.Data {
 
@@ -148,9 +148,10 @@ module BD.APP.Data {
 
 
             var deals = Common.Collection.of(eventResult).orderByDesc(o => o.score).select((eventResult:EventApiResult, index:number) => {
+                var merchant = Common.MerchantHelper.getMerchant();
                 var deal:Data.Event = { title:eventResult.title,
-                merchant: eventResult.merchant,
-                merchantImage: eventResult.merchantImage,
+                merchant: eventResult.merchant || merchant.text,
+                merchantImage: eventResult.merchantImage || merchant.image,
                 url:eventResult.url,
                 image: eventResult.image,
                 date : eventResult.date,
@@ -167,10 +168,11 @@ module BD.APP.Data {
 
 
             var deals = Common.Collection.of(performers).orderByDesc(o => o.score).select((performers:PerformersApiResult, index:number) => {
+                var merchant = Common.MerchantHelper.getMerchant();
                 var deal:Data.Performers = {
                     title: performers.title,
-                    merchant: performers.merchant,
-                    merchantImage: performers.merchantImage,
+                    merchant: performers.merchant || merchant.text,
+                    merchantImage: performers.merchantImage || merchant.image,
                     url:performers.url,
                     keywords:performers.keywords,
                     image: performers.image,

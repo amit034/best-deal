@@ -69,6 +69,7 @@ module BD.APP.Products {
                 var deals:Deal[] = TicketsApi.dealsFromPerformers(primaryPerformers) ;
                 deals = deals.concat(TicketsApi.eventsFromResult(primaryEvents));
                 if (deals.length == 0){
+                    merchant
                     deals.push({
                         title: null,
                         merchant: "Compare with 20+ websites for the best price",
