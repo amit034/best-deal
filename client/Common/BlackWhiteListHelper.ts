@@ -6,7 +6,8 @@
 
 module BD.APP.Common {
 
-
+	
+	
     export interface MatchAndScore {
         match:string;
         score:number;
@@ -46,20 +47,22 @@ module BD.APP.Common {
             return [host];
         }
 
-        static blackWhiteMatch(domains:string[], whiteUrl:string, blackUrl:string, verifyUrl:string) : Common.Promise<MatchAndScore> {
+        static blackWhiteMatch(domains:string[],vertical, blackwhiteUrl:string ) : Common.Promise<MatchAndScore> {
             var promises: {[index:string]: Common.Promise<string>} = {};
-            if (whiteUrl != null) promises['white'] = jqGetPromise(whiteUrl);
-            if (blackUrl != null) promises['black'] = jqGetPromise(blackUrl);
-            return namedWhen2(promises).then((results:{[index: string]: any}) => {
-                var whiteBloom = 'white' in results ? BlackWhiteListHelper.parseBloomFromResponse(results['white']) : null;
-                var blackBloom = 'black' in results ? BlackWhiteListHelper.parseBloomFromResponse(results['black']) : null;
+            
+           
+            return jqGetPromise(blackwhiteUrl + "?vertical=" + vertical).then((result:any) => {
+				var cleanResult = result.match(/\[.*\]/)[0];
+				var json = JSON3.parse(result);	
+			    var whiteBloom = json['white']? BlackWhiteListHelper.parseBloomFromResponse(json['white']) : null;
+                var blackBloom = json['black'] ? BlackWhiteListHelper.parseBloomFromResponse(json['black']) : null;
 
                 // Initialize the chain with an undetermined result
                 var chain:Promise<MatchAndScore> = resolve({match: null, score: 0});
 
                 for (var i = 0; i < domains.length; i++) {
                     var value = domains[i].toLowerCase();
-                    var closure = BlackWhiteListHelper.createTestMatchClosure(whiteBloom, blackBloom, verifyUrl, value);
+                    var closure = BlackWhiteListHelper.createTestMatchClosure(whiteBloom, blackBloom, value);
 
                     chain = chain.then(closure);
                 }
@@ -69,18 +72,16 @@ module BD.APP.Common {
             })
         }
 
-        private static parseBloomFromResponse(response:string):BD.BloomFilter {
-            var cleanResult = response.match(/\[.*\]/)[0];
-
-            var bloomArray:number[] = JSON3.parse(cleanResult);
-            return new BD.BloomFilter(bloomArray, 10);
+        private static parseBloomFromResponse(bloomArray:number[]):BD.BloomFilter {
+            
+            return new BloomFilter(bloomArray, 10);
         }
 
-        private static createTestMatchClosure(whiteBloom:BD.BloomFilter, blackBloom:BD.BloomFilter, verifyUrl:string, value:string):(number) => Promise<MatchAndScore> {
+        private static createTestMatchClosure(whiteBloom:BD.BloomFilter, blackBloom:BD.BloomFilter, value:string):(number) => Promise<MatchAndScore> {
 
             return ((prevResult:MatchAndScore) => {
                 if (prevResult.score == 0) {
-                    return BlackWhiteListHelper.testMatch(whiteBloom, blackBloom, verifyUrl, value);
+                    return BlackWhiteListHelper.testMatch(whiteBloom, blackBloom, value);
                 }
                 else {
                     return resolve(prevResult)
@@ -88,24 +89,13 @@ module BD.APP.Common {
             });
         }
 
-        private static testMatch(whiteBloom:BD.BloomFilter, blackBloom:BD.BloomFilter, verifyUrl:string, value:string):Promise<MatchAndScore> {
+        private static testMatch(whiteBloom:BD.BloomFilter, blackBloom:BD.BloomFilter, value:string):Promise<MatchAndScore> {
             //console.log("Testing against " + value);
 
             var whiteBloomMatched = whiteBloom && whiteBloom.test(value);
             var blackBloomMatched = blackBloom && blackBloom.test(value);
 
-            if (verifyUrl && (whiteBloomMatched || blackBloomMatched)) {
-                var url = verifyUrl + encodeURIComponent(value);
-
-                return jqGetPromise(url).then((response) => {
-                    var result = JSON3.parse(response);
-                    var found = ("found" in result) ? (result["found"] ? 2 : -1) : 0;
-
-                    if (found) Logger.log("WBL for " + value + ": " + found);
-                    return {match: value, score: found};
-                });
-            }
-            else if (whiteBloomMatched) {
+            if (whiteBloomMatched) {
                 return resolve({match: value, score: 1});
             }
             else if (blackBloomMatched) {

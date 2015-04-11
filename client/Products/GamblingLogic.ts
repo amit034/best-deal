@@ -61,7 +61,7 @@ module BD.APP.Products {
             var prunedResult:Promise<Data.PlainDataResult<Data.Coupon>> =Data.GamblingApi.queryApi(context, count, null, gamblingQueryData).then(result => {
                 var flag = context.logic().flag() + "_" + context.visual.flag();
 
-                var primaryCoupons = sync.claimUniques<CouponApiResult>(result.coupons, (r) => r.url, flag, count );
+                var primaryCoupons = sync.claimUniques<CouponApiResult>(result.coupons, (r) => r.link, flag, count );
                 var deals:Coupon[] = GamblingApi.couponsFromResult(primaryCoupons) ;
                 return new Data.PlainDataResult(result.source, context, deals);
             });

@@ -7,36 +7,33 @@
 /// <reference path="../Common/Retargeting.ts" />
 /// <reference path="../Common/WordCounter.ts" />
 /// <reference path="../Common/WordUtils.ts" />
-/// <reference path="../Data/TicketsApi.ts" />
+/// <reference path="../Data/MedicalApi.ts" />
 /// <reference path="../Data/SourceAndResults" />
 /// <reference path="../Common/DataSynchronizer.ts" />
 /// <reference path="../Products/IProductLogic" />
-/// <reference path="../Vertical/TicketsHelper" />
+/// <reference path="../Vertical/MedicalHelper" />
 
 module BD.APP.Products {
     import Promise = BD.APP.Common.Promise;
     import SourceAndResults = Data.SourceAndResults;
     import TicketsApiResult = Data.TicketsApiResult;
     import DealApiResult = Data.DealApiResult;
-    import QueryData = Data.QueryData;
-    import TicketsApi = Data.TicketsApi;
+    import CouponApiResult = Data.CouponApiResult;
+    import GamblingQueryData = Data.GamblingQueryData;
+    import MedicalApi = Data.MedicalApi;
     import EventApiResult = Data.EventApiResult;
     import PerformersApiResult = Data.PerformersApiResult;
     import Deal = Data.Deal;
-    export interface amplify{
-        source:string;
-        keywords:string[];
-        weight:number;
-    }
-
-    export class TicketsLogic implements Products.IProductLogic {
+    import Coupon = Data.Coupon;
+	
+    export class MedicalLogic implements Products.IProductLogic {
 
         flag():string {
-            return "pp";
+            return "medical";
         }
 
         dataKey():string {
-            return "CommerceDeals";
+            return "Coupons";
         }
 
         supportsStickyClassification():boolean {
@@ -47,7 +44,7 @@ module BD.APP.Products {
         classify(context:Context.IAppContext):Common.Promise<Common.INamedValue<number>> {
             return Common.namedWaterfall([
 
-                {name: "bwl", value: () => Vertical.TicketsHelper.classifyByBlackWhiteList(context)}
+                {name: "bwl", value: () => Vertical.MedicalHelper.classifyByBlackWhiteList(context)}
 
             ], (score:number) => score != 0).alwaysThen((scoreAndSource, rej) => {
                 return rej ? {name: rej.message, value: 0} : scoreAndSource;
@@ -60,27 +57,12 @@ module BD.APP.Products {
             data.wordCounts = this.genericScrap(context);
 
             data.source = 'generic-scrap';
-            var queryData= Data.TicketsApi.queryFromData(context, data);
-            var prunedResult:Promise<Data.PlainDataResult<Data.Deal>> =Data.TicketsApi.queryApi(context, count, null, queryData).then(result => {
+            var gamblingQueryData= Data.MedicalApi.queryFromData(context, data);
+            var prunedResult:Promise<Data.PlainDataResult<Data.Coupon>> =Data.MedicalApi.queryApi(context, count, null, gamblingQueryData).then(result => {
                 var flag = context.logic().flag() + "_" + context.visual.flag();
 
-                var primaryEvents = sync.claimUniques<EventApiResult>(result.events, (r) => r.url, flag, count );
-                var primaryPerformers = sync.claimUniques<PerformersApiResult>(result.performers, (r) => r.url, flag, count );
-                var deals:Deal[] = TicketsApi.dealsFromPerformers(primaryPerformers) ;
-                deals = deals.concat(TicketsApi.eventsFromResult(primaryEvents));
-                if (deals.length == 0){
-                   
-                    deals.push({
-                        title: null,
-                        merchant: "Compare with 20+ websites for the best price",
-                        merchantImage: null,
-                        url:"https://seatgeek.com/",
-                        keywords:"",
-                        image: null,
-                        images: null,
-                        onClick: null
-                    })
-                }
+                var primaryCoupons = sync.claimUniques<CouponApiResult>(result.coupons, (r) => r.link, flag, count );
+                var deals:Coupon[] = MedicalApi.couponsFromResult(primaryCoupons) ;
                 return new Data.PlainDataResult(result.source, context, deals);
             });
 
@@ -94,7 +76,7 @@ module BD.APP.Products {
 
 
 
-        private postProcessResults(context:Context.LVContext, results:Promise<Data.PlainDataResult<Data.Deal>>):void {
+        private postProcessResults(context:Context.LVContext, results:Promise<Data.PlainDataResult<Data.Coupon>>):void {
 
             results.then(result => {
                 if (result.data.length) {
@@ -103,7 +85,7 @@ module BD.APP.Products {
                     Common.Retargeting.storeImpressionKeywords(context, firstKeywords);
 
                     // Attach onClick delegate to register clicked keywords for retargeting. The delegate will be carried to the ViewModel in the Visual
-                    Common.Collection.each(result.data, (deal:Data.Deal) => {
+                    Common.Collection.each(result.data, (deal:Data.Coupon) => {
                         deal.onClick = () => {
                             Common.Retargeting.storeClickKeywords(context, deal.keywords);
 
@@ -167,8 +149,8 @@ module BD.APP.Products {
 
                 //push and  amplify
                 var amplifyList:amplify[] = [];
-                amplifyList.push({keywords:titleWords, weight:2, source:"Title"});
-                amplifyList.push({keywords:firstH1Words, weight:2, source:"H1"});
+                amplifyList.push({keywords:titleWords, weight:1, source:"Title"});
+                amplifyList.push({keywords:firstH1Words, weight:1, source:"H1"});
 
                 amplifyList.push({keywords:validTextFieldsWords, weight:1, source:"Text inputs"});
                 amplifyList.push({keywords:validSearchFieldsWords, weight:1, source:"Search inputs"});
@@ -187,12 +169,14 @@ module BD.APP.Products {
             });
 
             var wordCounts = Common.WordUtils.countWords(filteredWords);
-			
+
             return wordCounts;
         }
 
 
-    }
+
+
+     }
 
 
 }

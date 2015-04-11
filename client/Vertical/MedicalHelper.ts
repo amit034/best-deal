@@ -2,7 +2,7 @@
 /// <reference path="../Common/Collection.ts" />
 module BD.APP.Vertical {
 
-    export class GamblingHelper {
+    export class MedicalHelper {
 
        
         static classifyByBlackWhiteList(context:Context.IAppContext):Common.Promise<number> {
@@ -10,7 +10,7 @@ module BD.APP.Vertical {
             
             var domainsToCheck = Common.BlackWhiteListHelper.breakdownHost();
             
-            return Common.BlackWhiteListHelper.blackWhiteMatch(domainsToCheck,"gambling", context.paths().apiRoot() + "/bwl")
+            return Common.BlackWhiteListHelper.blackWhiteMatch(domainsToCheck,"medical", context.paths().apiRoot() + "/bwl")
                 .then((result:Common.MatchAndScore) => result.score);
 
             

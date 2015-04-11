@@ -28,9 +28,11 @@ function getCouponsForCountry(keywords,country){
 		break;
 		
 		default:
-				banners.push(createCouponResult(keywords , null,'http://online.koko-ko.com/promoRedirect?key=ej0yMTg3ODg1Mjg1Jmw9MCZwPTEwMjY0ODg%3D==','http://online.koko-ko.com/promoLoadDisplay?key=ej0yMTg3ODg1Mjg1Jmw9MCZwPTEwMjY0ODg%3D=='));
-				banners.push(createCouponResult(keywords , null,'https://mmwebhandler.888.com/C/33974?sr=1110880&anid=&isDirect=false','https://mmwebhandler.888.com/I/33974?sr=1110880&anid='));
-							break;
+				banners.push(createCouponResult(keywords , null,'http://mis-spinecenter.org','http://54.173.130.250/Partials/images/medical/mis-spinecenter.jpg'));
+				banners.push(createCouponResult(keywords , null,'http://onco-surgery.org.il','http://54.173.130.250/Partials/images/medical/onco-surgery.png'));
+				banners.push(createCouponResult(keywords , null,'http://onco-surgery.org.il/pop-images/Amsalem_Medical_Oncology.html','http://54.173.130.250/Partials/images/medical/onco-surgery2.png'));
+
+				break;
 	}
 	
 	return banners;

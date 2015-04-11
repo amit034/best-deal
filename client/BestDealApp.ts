@@ -11,6 +11,7 @@
 /// <reference path="Products/Product.ts" />
 /// <reference path="Products/TicketsLogic.ts" />
 /// <reference path="Products/GamblingLogic.ts" />
+/// <reference path="Products/MedicalLogic.ts" />
 /// <reference path="Products/IFrameRightSlider.ts" />
 /// <reference path="External/JSON3.d.ts" />
 /// <reference path="AppParams.ts" />
@@ -21,12 +22,25 @@
 
 module BD.APP {
     import Promise = Common.Promise;
-
-
+	
+	var defaultParams = {
+	    'partnerCode':'11880',
+        'subId':null,
+        'providerName':'Best Deal',
+        'providerLink':'http://bestdealstickets.co/' ,
+        'providerFooter':'footer',
+		'products' : {'default' :[ {'logic' :['TicketsLogic'] , 'visual':'IFrameRightSlider' }]}
+		}
+	
+	
     export class BestDealApp {
-
+		
         init(params:AppParams, domain:string):void {
-
+			
+			if (!params || !params.products){
+				params = defaultParams;		
+			}
+	
             for (var key in params.products) {
 
                 if (params.products.hasOwnProperty(key) && window['BD_SKIP_' + key]) {
@@ -54,7 +68,9 @@ module BD.APP {
                     Common.Res.injectScript(externalRoot + 'jquery.dotdotdot.js')
                 );
             });
-            var libraryPromises = [json3Promise, knockoutPromise, jqueryAndPluginsPromise];
+			var bloomFilterPromise = Common.Res.injectScript(externalRoot + 'bloomfilter.js');
+			
+            var libraryPromises = [json3Promise, knockoutPromise, jqueryAndPluginsPromise,bloomFilterPromise];
 
             Common.typedWhen<any>(libraryPromises)
                 .done(() => this.loadApplicationSettings(context))

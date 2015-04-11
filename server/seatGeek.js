@@ -1,16 +1,17 @@
  
 var _ = require('underscore-node');
+var dateFormat = require('dateformat');
 var Q = require('q');
 var http = require('request');
 var qs = require('qs');  
-var trivialWords = ["tickets", "concerts","sports","arts", "theater", "family" ,"events", "more", "official", "site"]
+var trivialWords = ["tickets", "concerts","sports","arts", "theater", "family" ,"events", "more","official","site","nba","nhl","nfl","mbl","broadway"]
 exports.getTickets = function(request) {
  
   var deferred = Q.defer();	
   
-  if (request && request.keywords && request.keywords.length >1  ){
+  if (request && request.keywords  ){
 	  console.log(request.keywords.join(" "));
-	  getEvents(request.keywords,deferred);
+	  getEvents(_.difference (request.keywords, trivialWords),deferred);
   }else{
 	  deferred.reject("missing params") ;
   }
@@ -73,12 +74,12 @@ function geekEventsToEvents(events,keywordsStr){
 }
 
 function geekEventToEvent(event,keywordsStr){
-
+	
 	return {
-		title : event.title,
+		title : event.venue ? event.title + " at " + event.venue.name : event.title,
 		url : event.url,
 		image: event.performers? event.performers[0].image : null,
-		date: event.datetime_local,
+		date: event.datetime_local? dateFormat(new Date(event.datetime_local),"ddd dd mmm yyyy HH:MM") : null,
 		score: event.score,
 		prices : {
 					listing : event.stats.listing_count ,

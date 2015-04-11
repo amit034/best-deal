@@ -9,7 +9,7 @@
 
         <div class="fo-tabs-wrapper">
             <div class="fo-handles">
-                <div class="fo-tab-handle fo-deals-tab-handle" data-bind="visible: bannersModel.banners.length, css: {'fo-active': selectedTab() == 0}, click: function() { selectTab(0) }">
+                <div class="fo-tab-handle fo-deals-tab-handle" data-bind="visible: bannersModel.banners.length || coupons.offers.length, css: {'fo-active': selectedTab() == 0}, click: function() { selectTab(0) }">
                     <!--ko text: strings['deals_tab']--><!--/ko-->
                 </div>
             </div>
@@ -54,7 +54,7 @@
 
                             <!--ko if: !banner.title-->
                             <!--<a data-bind="attr: {href: banner.url}" target="_top">-->
-                            <div class="fo-item" buy-text="hi there" data-bind="attr: {'buy-text': $parent.strings['compare']}, event: { click:onClick, mouseover: hoverStart, mouseout: hoverEnd }">
+                            <div class="fo-item" buy-text="hi there" data-bind="attr: {'buy-text': 'Reveal Code'}, event: { click:onClick, mouseover: hoverStart, mouseout: hoverEnd }">
 
                                 <div class="fo-title elps" data-bind="text: 'Compare with Best Best Deals'"></div>
 
@@ -63,30 +63,37 @@
                             <!-- /ko -->
 
                         </li>
-                        <!-- /ko -->
-						
+                        	<!-- /ko -->
+					</ul>
+				</div>
+                <div class="fo-scroll-btn fo-scroll-down fa fa-chevron-down"  data-scroll-step="1" data-bind="visible:bannersModel.banners.length > 2"></div>
+            </div>
+			<div class="fo-deals-tab fo-tab" data-bind="visible: selectedTab() == 1">
+				<div class="fo-deals-header fo-header" data-bind="html: strings['deals_header']"></div>
+				<div class="fo-scroll-btn fo-scroll-up fa fa-chevron-up" data-scroll-step="-1" data-bind="visible:coupons.offers.length > 2"></div>
+                <div class="fo-list-wrapper">
+                    <ul class="fo-list">		
+						<li>
+							<div style="FONT: 11px tahoma,sans-serif; WIDTH: 250px; TEXT-ALIGN: center"><a href="http://online.koko-ko.com/promoRedirect?key=ej0yMTg3ODg1Mjg1Jmw9MCZwPTEwMjY0ODg%3D==" title="Free Casino Bonus at Casino Tropez "><img src="http://online.koko-ko.com/promoLoadDisplay?key=ej0yMTg3ODg1Mjg1Jmw9MCZwPTEwMjY0ODg%3D==" width="250" height="250" border="0" alt="Free Casino Bonus at Casino Tropez "/></a></div>
+						</li>
 						<!-- ko foreach: { data: coupons.offers }-->
                         <li>
                             <!--ko if: banner.script-->
                             <script data-bind="attr: {src: banner.script}"></script>
                             <!-- /ko -->
 							<!--ko if: banner.link-->
-							<a data-bind="attr: {href: banner.link}">
+							<a data-bind="attr: {href: banner.link}" target="_top">
 								<!--ko if: banner.image-->
 								<img data-bind="attr: {src: banner.image}"/>
 								<!-- /ko -->
 							</a>                           
-                            <!-- /ko -->
-							<a data-bind="attr: {href: banner.link}" target="_top">
-								<img data-bind="attr: {src: banner.image}"/>
-								
-							</a>           
+                            <!-- /ko -->			        
                         </li>
 						<!-- /ko -->
                     </ul>
 
                 </div>
-                <div class="fo-scroll-btn fo-scroll-down fa fa-chevron-down"  data-scroll-step="1" data-bind="visible:bannersModel.banners.length > 2"></div>
+                <div class="fo-scroll-btn fo-scroll-down fa fa-chevron-down"  data-scroll-step="1" data-bind="visible:coupons.offers.length > 2"></div>
             </div>
 
 
