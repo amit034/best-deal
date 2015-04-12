@@ -10,22 +10,23 @@
 
 module BD.APP.Data {
 
-    export interface GamblingApiRequestData {
+    export interface CouponApiRequestData {
         wordCounts:Common.Map<number>
         specialContext?: string;
         source:string;
     }
 
-    export interface GamblingQueryData {
+    export interface CouponQueryData {
         kwc: {w:string; c:number}[];
 
         source: string;
     }
 
+
     export interface CouponApiResult {
         script:string;
 		link:string;
-		image:string;
+        image : CouponImage;
         title:string;
         keywords:string;
 		url:string;
@@ -38,7 +39,7 @@ module BD.APP.Data {
         partialCode:string;
         score:number;
     }
-    export interface GamblingApiResult{
+    export interface CouponsApiResult{
         coupons : CouponApiResult [];
 
         source:string;
@@ -51,7 +52,7 @@ module BD.APP.Data {
 
         private static MIN_WORDS = 4;
 
-        private static pruneQueryData(data:GamblingQueryData, remove:string[]):GamblingQueryData {
+        private static pruneQueryData(data:CouponQueryData, remove:string[]):CouponQueryData {
 
             var kwc = Common.Collection.of(data.kwc).where((x:{w:string; c:number}) => !Common.Collection.contains(remove, x.w))
 
@@ -65,13 +66,13 @@ module BD.APP.Data {
 
         }
 
-        private static logQueryData(data:GamblingQueryData):void {
+        private static logQueryData(data:CouponQueryData):void {
 
             var kwcString = Common.Collection.of(data.kwc).select(x => x.w + " (" + x.c + ")").stringJoin(" ");
             Logger.info("Requesting offers with\nSource:\t" + data.source +  "\nKwds:\t" + kwcString + "\n");
         }
 
-        static queryApi(context:Context.IAppContext, quantity:number, specialContext:string, data:GamblingQueryData):Common.Promise<GamblingApiResult> {
+        static queryApi(context:Context.IAppContext, quantity:number, specialContext:string, data:CouponQueryData):Common.Promise<CouponsApiResult> {
 
 
             var params:{[index:string]: any } = {
@@ -98,26 +99,18 @@ module BD.APP.Data {
             });
         }
 
-
-
-        static queryFromData(context:Context.IAppContext, data:GamblingApiRequestData):GamblingQueryData {
-
+        static queryFromData(context:Context.IAppContext, data:CouponApiRequestData):CouponQueryData {
 
             var formattedWordCounts = data.wordCounts.select((x:Common.Keyed<number>) => {
                 return {"w": x.key, "c": x.value};
             }).toArray();
-
 
             var allWordString:string = Common.Collection.select(formattedWordCounts, x => x.w).join(" ");
 
             var res = {kwc: formattedWordCounts, t: allWordString, source: 'api-' + data.source};
             return res;
 
-
         }
-
-
-
 
 
         static couponsFromResult(couponsResult:CouponApiResult[]):Data.Coupon[] {
@@ -133,12 +126,12 @@ module BD.APP.Data {
                     onClick : couponResult.onClick,
                     score:null,
                     keywords: couponResult.keywords,
-                merchant: couponResult.merchant,
-                merchantImage: couponResult.merchantImage,
-                revealed: couponResult.revealed,
-                code: couponResult.code,
-                isDirect: couponResult.isDirect,
-                partialCode:couponResult.partialCode
+                    merchant: couponResult.merchant,
+                    merchantImage: couponResult.merchantImage,
+                    revealed: couponResult.revealed,
+                    code: couponResult.code,
+                    isDirect: couponResult.isDirect,
+                    partialCode:couponResult.partialCode
                 };
                 return coupon;
             });

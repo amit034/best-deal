@@ -12,24 +12,10 @@ module BD.APP.Vertical {
 
         static classifyByBlackWhiteList(context:Context.IAppContext):Common.Promise<number> {
 
-            if (document.location.pathname.indexOf("/shop") == 0) {
-                return Common.resolve(1);
-            }
-
             var domainsToCheck = Common.BlackWhiteListHelper.breakdownHost();
-            var isGoogle = Common.Collection.contains(domainsToCheck, "google");
 
-            if (isGoogle && document.location.href.indexOf("tbm=shop") != -1) {
-                return Common.resolve(1);
-            }
-
-            // Regex to be aligned with old method.
-            if (context.host().toLowerCase().match(this.blackRegex)) {
-                Logger.log("Host matched black REGEX - Classifying as non-commerce");
-                return Common.resolve(-1);
-            }
-
-            return Common.resolve(1);
+            return Common.BlackWhiteListHelper.blackWhiteMatch(domainsToCheck,"tickets", context.paths().apiRoot() + "/bwl")
+                .then((result:Common.MatchAndScore) => result.score);
         }
 
 

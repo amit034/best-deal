@@ -32,7 +32,7 @@ module BD.APP.Products {
     export class TicketsLogic implements Products.IProductLogic {
 
         flag():string {
-            return "pp";
+            return "tickets";
         }
 
         dataKey():string {
@@ -74,7 +74,7 @@ module BD.APP.Products {
                         title: null,
                         merchant: "Compare with 20+ websites for the best price",
                         merchantImage: null,
-                        url:"https://seatgeek.com/",
+                        url:"https://seatgeek.com/?aid=11188",
                         keywords:"",
                         image: null,
                         images: null,

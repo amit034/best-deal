@@ -15,7 +15,7 @@ module BD.APP.Data {
 
         private static MIN_WORDS = 4;
 
-        private static pruneQueryData(data:GamblingQueryData, remove:string[]):GamblingQueryData {
+        private static pruneQueryData(data:CouponQueryData, remove:string[]):CouponQueryData {
 
             var kwc = Common.Collection.of(data.kwc).where((x:{w:string; c:number}) => !Common.Collection.contains(remove, x.w))
 
@@ -29,13 +29,13 @@ module BD.APP.Data {
 
         }
 
-        private static logQueryData(data:GamblingQueryData):void {
+        private static logQueryData(data:CouponQueryData):void {
 
             var kwcString = Common.Collection.of(data.kwc).select(x => x.w + " (" + x.c + ")").stringJoin(" ");
             Logger.info("Requesting offers with\nSource:\t" + data.source +  "\nKwds:\t" + kwcString + "\n");
         }
 
-        static queryApi(context:Context.IAppContext, quantity:number, specialContext:string, data:GamblingQueryData):Common.Promise<GamblingApiResult> {
+        static queryApi(context:Context.IAppContext, quantity:number, specialContext:string, data:CouponQueryData):Common.Promise<CouponsApiResult> {
 
 
             var params:{[index:string]: any } = {
@@ -64,7 +64,7 @@ module BD.APP.Data {
 
 
 
-        static queryFromData(context:Context.IAppContext, data:GamblingApiRequestData):GamblingQueryData {
+        static queryFromData(context:Context.IAppContext, data:CouponApiRequestData):CouponQueryData {
 
 
             var formattedWordCounts = data.wordCounts.select((x:Common.Keyed<number>) => {

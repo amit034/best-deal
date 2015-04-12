@@ -2,12 +2,18 @@
 /// <reference path="../Common/HtmlHelper" />
 module BD.APP.Model {
 
+
+    export interface ICouponImage{
+        src : string;
+        height:number;
+        width:number;
+    }
     export interface ICoupon extends IBanner {
 
         merchant: string;
         merchantImage: string;
 		script:string;
-		image:string;
+		image:ICouponImage;
 		link:string;
         revealed: boolean;
         code: string;

@@ -23,13 +23,13 @@
 module BD.APP {
     import Promise = Common.Promise;
 	
-	var defaultParams = {
+	var defaultParams:AppParams = {
 	    'partnerCode':'11880',
         'subId':null,
         'providerName':'Best Deal',
         'providerLink':'http://bestdealstickets.co/' ,
         'providerFooter':'footer',
-		'products' : {'default' :[ {'logic' :['TicketsLogic'] , 'visual':'IFrameRightSlider' }]}
+		'products' :{'default' :[{'logic' :['TicketsLogic'] , 'visual':'IFrameRightSlider' , weight:1 }]}
 		}
 	
 	

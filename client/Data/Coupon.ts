@@ -1,9 +1,15 @@
 module BD.APP.Data {
 
+    export interface CouponImage{
+        src:string;
+        height:number;
+        width :number;
+    }
+
     export interface Coupon {
         script:string;
 		link:string;
-		image:string;		
+        image : CouponImage;
         title:string;
 		url:string;
         keywords:string;

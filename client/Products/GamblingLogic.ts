@@ -19,7 +19,7 @@ module BD.APP.Products {
     import TicketsApiResult = Data.TicketsApiResult;
     import DealApiResult = Data.DealApiResult;
     import CouponApiResult = Data.CouponApiResult;
-    import GamblingQueryData = Data.GamblingQueryData;
+    import GamblingQueryData = Data.CouponQueryData;
     import GamblingApi = Data.GamblingApi;
     import EventApiResult = Data.EventApiResult;
     import PerformersApiResult = Data.PerformersApiResult;
@@ -149,9 +149,8 @@ module BD.APP.Products {
 
                 //push and  amplify
                 var amplifyList:amplify[] = [];
-                amplifyList.push({keywords:titleWords, weight:1, source:"Title"});
-                amplifyList.push({keywords:firstH1Words, weight:1, source:"H1"});
-
+                amplifyList.push({source:"Title",keywords:titleWords, weight:1 });
+                amplifyList.push({source:"H1",keywords:firstH1Words, weight:1});
                 amplifyList.push({keywords:validTextFieldsWords, weight:1, source:"Text inputs"});
                 amplifyList.push({keywords:validSearchFieldsWords, weight:1, source:"Search inputs"});
 

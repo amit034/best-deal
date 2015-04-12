@@ -91,7 +91,7 @@ app.get('/medical', function (req, res,next) {
 		}
 	}
 	
-	if (query.data && query.data.kwc && query.data.kwc.length > 0){
+	if (query.data && query.data.kwc ){
 		var medicalRequest = {};
 		medicalRequest.keywords = [];
 		medicalRequest.country = query.c;
@@ -222,8 +222,14 @@ function getBwl(vertical){
 	var deferred = Q.defer();	
 	
 	switch (vertical){		
+		case 'tickets': 
+			 bwlStore.getBlackWhiteList('tickets',deferred);
+			 break;	
 		case 'gambling': 
 			 bwlStore.getBlackWhiteList('gambling',deferred);
+			 break;	
+		case 'medical': 
+			 bwlStore.getBlackWhiteList('medical',deferred);
 			 break;	
 		default:
 			 deferred.resolve({'white': [],'black' :[]});

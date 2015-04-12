@@ -4,7 +4,7 @@ var dateFormat = require('dateformat');
 var Q = require('q');
 var http = require('request');
 var qs = require('qs');  
-var trivialWords = ["tickets", "concerts","sports","arts", "theater", "family" ,"events", "more","official","site","nba","nhl","nfl","mbl","broadway"]
+var trivialWords = ["tickets", "concerts","sports","arts", "theater", "family" ,"events", "more","official","site","nba","nhl","nfl","mbl","broadway" , "find"]
 exports.getTickets = function(request) {
  
   var deferred = Q.defer();	
@@ -77,7 +77,7 @@ function geekEventToEvent(event,keywordsStr){
 	
 	return {
 		title : event.venue ? event.title + " at " + event.venue.name : event.title,
-		url : event.url,
+		url : event.url + '?aid=11188',
 		image: event.performers? event.performers[0].image : null,
 		date: event.datetime_local? dateFormat(new Date(event.datetime_local),"ddd dd mmm yyyy HH:MM") : null,
 		score: event.score,
@@ -94,7 +94,7 @@ function geekEventToEvent(event,keywordsStr){
 function geekperformersToPerformer(performers){
 	return {
 		title : performers.name,
-		url : performers.url,
+		url : performers.url + '?aid=11188',
 		image: performers.image,
 		score: performers.score	
 	}

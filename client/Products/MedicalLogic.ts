@@ -19,7 +19,7 @@ module BD.APP.Products {
     import TicketsApiResult = Data.TicketsApiResult;
     import DealApiResult = Data.DealApiResult;
     import CouponApiResult = Data.CouponApiResult;
-    import GamblingQueryData = Data.GamblingQueryData;
+    import GamblingQueryData = Data.CouponQueryData;
     import MedicalApi = Data.MedicalApi;
     import EventApiResult = Data.EventApiResult;
     import PerformersApiResult = Data.PerformersApiResult;
@@ -54,11 +54,11 @@ module BD.APP.Products {
 
         scrapeAndObtainData(context:Context.LVContext, count:number, sync:Common.DataSynchronizer):Promise<Data.DataResult> {
             var data:Data.TicketsApiRequestData = {wordCounts: Common.Map.emptyMap<number>(), price: 0, source: null};
-            data.wordCounts = this.genericScrap(context);
+            //data.wordCounts = this.genericScrap(context);
 
             data.source = 'generic-scrap';
-            var gamblingQueryData= Data.MedicalApi.queryFromData(context, data);
-            var prunedResult:Promise<Data.PlainDataResult<Data.Coupon>> =Data.MedicalApi.queryApi(context, count, null, gamblingQueryData).then(result => {
+            var couponsQueryData= Data.MedicalApi.queryFromData(context, data);
+            var prunedResult:Promise<Data.PlainDataResult<Data.Coupon>> =Data.MedicalApi.queryApi(context, count, null, couponsQueryData).then(result => {
                 var flag = context.logic().flag() + "_" + context.visual.flag();
 
                 var primaryCoupons = sync.claimUniques<CouponApiResult>(result.coupons, (r) => r.link, flag, count );

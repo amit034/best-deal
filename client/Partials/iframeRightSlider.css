@@ -278,6 +278,7 @@
             text-align: left;
             margin-top: 15px;
             line-height: 15px;
+			max-height: 60px;
             color: rgba(57, 156, 222, 0.99) }
           .fo-container.fo-iframe-right-slider > .fo-sub-wrapper .fo-tabs-wrapper .fo-tab.fo-deals-tab .fo-item .fo-price {
             font-size: 25px;
@@ -914,7 +915,7 @@
   -o-transition: all none;
   transition: all none; }
   .fo-iframe-right-slider.fo-container .fo-list-wrapper {
-    max-height: 426px;
+    max-height: 508px;
     overflow-y: hidden; }
   .fo-iframe-right-slider.fo-container.fo-closed {
     right: 0 !important; }
