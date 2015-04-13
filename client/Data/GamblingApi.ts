@@ -122,7 +122,7 @@ module BD.APP.Data {
 					script:couponResult.script,
 					link:couponResult.link,
 					image :couponResult.image,
-                    url:couponResult.url,
+                    url:couponResult.link,
                     onClick : couponResult.onClick,
                     score:null,
                     keywords: couponResult.keywords,

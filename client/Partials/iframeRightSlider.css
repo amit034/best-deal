@@ -305,7 +305,7 @@
 			  background-size: contain;
 			  color: #00afb4;
 			  font-family: 'Open Sans',sans-serif; }
-          .fo-container.fo-iframe-right-slider > .fo-sub-wrapper .fo-tabs-wrapper .fo-tab.fo-deals-tab .fo-item:after {
+          .fo-container.fo-iframe-right-slider > .fo-sub-wrapper .fo-tabs-wrapper .fo-tab .fo-item:after {
             content: attr(buy-text);
             width: 50%;
             top: 54px;
@@ -330,7 +330,7 @@
             -moz-opacity: 0.5;
             -khtml-opacity: 0.5;
             opacity: 0.5; }
-          .fo-container.fo-iframe-right-slider > .fo-sub-wrapper .fo-tabs-wrapper .fo-tab.fo-deals-tab .fo-item:hover:after {
+          .fo-container.fo-iframe-right-slider > .fo-sub-wrapper .fo-tabs-wrapper .fo-tab .fo-item:hover:after {
             opacity: 1.0;
             -webkit-transition: opacity 0.3s ease;
             -moz-transition: opacity 0.3s ease;
@@ -345,7 +345,6 @@
           border: 1px dashed #c7c5c9;
           text-align: center;
           width: 260px;
-          height: 123px;
           color: #5E696B;
           cursor: pointer;
           margin-bottom: 8px;
