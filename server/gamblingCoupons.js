@@ -26,15 +26,17 @@ function getCouponsForCountry(keywords,country){
 				banners.push(createCouponResult(keywords , null,'https://mmwebhandler.888.com/C/33772?sr=1110880&anid=&isDirect=false','https://mmwebhandler.888.com/I/33772?sr=1110880&anid=')); //888
 				banners.push(createCouponResult(keywords , null,'http://online.casinotropez.com/promoRedirect?key=ej0yMTg4MjE1OTEzJmw9MCZwPTEwMjY0ODg%3D==','http://online.casinotropez.com/promoLoadDisplay?key=ej0yMTg4MjE1OTEzJmw9MCZwPTEwMjY0ODg%3D==')); //euro
 				banners.push(createCouponResult(keywords , null,'http://ads.eurogrand.com/redirect.aspx?pid=185051021&bid=1487412813&lpid=1487412397','http://netrefer-a.akamaihd.net/williamhill/EuroGrand_2015_new_250x250_PL_Euro.gif'));
-		break;
+				break;
 		case 'ru' :
-		break;
-		
-		default:
 				banners.push(createCouponResult(keywords , null,'http://online.koko-ko.com/promoRedirect?key=ej0yMTg3ODg1Mjg1Jmw9MCZwPTEwMjY0ODg%3D==','http://online.koko-ko.com/promoLoadDisplay?key=ej0yMTg3ODg1Mjg1Jmw9MCZwPTEwMjY0ODg%3D=='));
 				banners.push(createCouponResult(keywords , null,'https://mmwebhandler.888.com/C/33974?sr=1110880&anid=&isDirect=false','https://mmwebhandler.888.com/I/33974?sr=1110880&anid='));		
 				banners.push(createCouponResult(keywords , null,'http://ads.eurogrand.com/redirect.aspx?pid=185051021&bid=1478809783&lpid=13519011','http://netrefer-a.akamaihd.net/williamhill/EuroGrand_2015_new_250x250_RU.gif'));
 				break;
+		break;
+		
+		default:
+				break;
+
 	}
 		
 	return banners;

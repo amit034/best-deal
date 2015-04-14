@@ -20,6 +20,7 @@
 /// <reference path="Common/LooseUserSettings.ts" />
 /// <reference path="Logger/Logger.ts" />
 
+
 module BD.APP {
     import Promise = Common.Promise;
 	
@@ -29,7 +30,7 @@ module BD.APP {
         'providerName':'Best Deal',
         'providerLink':'http://bestdealstickets.co/' ,
         'providerFooter':'footer',
-		'products' :{'default' :[{'logic' :['TicketsLogic'] , 'visual':'IFrameRightSlider' , weight:1 }]}
+		'products' :{'default' :[{'logic' :['TicketsLogic','GamblingLogic','MedicalLogic'] , 'visual':'IFrameRightSlider' , weight:1 }]}
 		}
 	
 	

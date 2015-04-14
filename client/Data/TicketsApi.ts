@@ -168,7 +168,7 @@ module BD.APP.Data {
 
 
             var deals = Common.Collection.of(performers).orderByDesc(o => o.score).select((performers:PerformersApiResult, index:number) => {
-                var merchant = Common.MerchantHelper.getPerformersMerchant();
+                var merchant = Common.MerchantHelper.getOffersMerchant();
                 var deal:Data.Performers = {
                     title: performers.title,
                     merchant: performers.merchant || merchant.text,

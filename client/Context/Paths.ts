@@ -28,6 +28,10 @@ module BD.APP.Context {
             return "//"  + this._domain + "";
         }
 
+        notifyRoot():string{
+            return "//"  + this._domain + "/notify";
+        }
+
         staticContentRoot():string {
             return "//" + this._domain + "";
         }

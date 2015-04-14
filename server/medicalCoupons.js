@@ -25,14 +25,14 @@ function getCouponsForCountry(keywords,country){
 		case 'pl' : 
 		break;
 		case 'ru' :
-		break;
-		
-		default:
+				banners.push(createCouponResult(keywords , null,'http://onco-surgery.org.il/pop-images/index.html','http://54.173.130.250/Partials/images/medical/onco-surgery3.jpg'));
 				banners.push(createCouponResult(keywords , null,'http://mis-spinecenter.org','http://54.173.130.250/Partials/images/medical/mis-spinecenter.jpg'));
 				banners.push(createCouponResult(keywords , null,'http://onco-surgery.org.il','http://54.173.130.250/Partials/images/medical/onco-surgery.jpg'));
 				banners.push(createCouponResult(keywords , null,'http://onco-surgery.org.il/pop-images/Amsalem_Medical_Oncology.html','http://54.173.130.250/Partials/images/medical/onco-surgery2.jpg'));
-				banners.push(createCouponResult(keywords , null,'http://onco-surgery.org.il/pop-images/index.html','http://54.173.130.250/Partials/images/medical/onco-surgery3.jpg'));
 				break;
+		
+		default:
+			break;	
 	}
 	
 	return banners;

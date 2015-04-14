@@ -71,13 +71,20 @@ module BD.APP.Model {
         }
 
         private setMoreDealsTarget(bannersModel:BannersModel<Data.Deal>) {
+            var context  = this.bannersModel.context ? this.bannersModel.context : this.coupons ? this.coupons.context : null;
+            var logic = context ? context.logic().flag() : null;
+            switch (logic){
+                case "gambling" :
+                    this.moreDealsUrl = "http://online.mik123.com/promoRedirect?key=ej0yMTkwNDA2MDc5Jmw9MzIyMjczMzMmcD0xMDI3MzQ3";
+                    break;
+                case "medical" :
+                    this.moreDealsUrl = null;
+                    break;
+                default :
+                    this.moreDealsUrl = "https://seatgeek.com/?aid=11188";
+                    break;
+            }
 
-            if (bannersModel.banners.length) {
-                this.moreDealsUrl = "http://bestdealwiz.com/productlist.html?q=" +  bannersModel.banners[0].banner.keywords.split(" ").join("+");
-            }
-            else {
-                this.moreDealsUrl = "http://bestdealwiz.com/index.html";
-            }
         }
 
 

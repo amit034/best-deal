@@ -13,8 +13,9 @@
 /// <reference path="../Products/IProductLogic" />
 /// <reference path="../Vertical/TicketsHelper" />
 
+
 module BD.APP.Products {
-    import Promise = BD.APP.Common.Promise;
+    import Promise = Common.Promise;
     import SourceAndResults = Data.SourceAndResults;
     import TicketsApiResult = Data.TicketsApiResult;
     import DealApiResult = Data.DealApiResult;
@@ -23,6 +24,8 @@ module BD.APP.Products {
     import EventApiResult = Data.EventApiResult;
     import PerformersApiResult = Data.PerformersApiResult;
     import Deal = Data.Deal;
+
+
     export interface amplify{
         source:string;
         keywords:string[];
@@ -67,20 +70,30 @@ module BD.APP.Products {
                 var primaryEvents = sync.claimUniques<EventApiResult>(result.events, (r) => r.url, flag, count );
                 var primaryPerformers = sync.claimUniques<PerformersApiResult>(result.performers, (r) => r.url, flag, count );
                 var deals:Deal[] = TicketsApi.dealsFromPerformers(primaryPerformers) ;
-                deals = deals.concat(TicketsApi.eventsFromResult(primaryEvents));
-                if (deals.length == 0){
-                   
-                    deals.push({
-                        title: null,
-                        merchant: "Compare with 20+ websites for the best price",
-                        merchantImage: null,
-                        url:"https://seatgeek.com/?aid=11188",
+                var events: Deal[] = TicketsApi.eventsFromResult(primaryEvents);
+                var merchant = Common.MerchantHelper.getOffersMerchant();
+                var defaultDeal:Deal = {
+
+                        title: deals.length == 0 ? "Today's Best Deals and Coupons" : deals[0].title,
+                        date : deals.length == 0 ? null : "Click here for more dates",
+                        merchant:  deals.length == 0 ? merchant.text : (<Data.Performers>deals[0]).merchant ,
+                        merchantImage: deals.length == 0 ? merchant.image : (<Data.Performers>deals[0]).merchantImage ,
+                        url: deals.length == 0 ? "https://seatgeek.com/?aid=11188" : (<Data.Performers>deals[0]).url,
                         keywords:"",
-                        image: null,
+                        image: deals.length == 0 ? null : (<Data.Performers>deals[0]).image,
                         images: null,
                         onClick: null
-                    })
+
                 }
+
+                deals = deals.concat(events);
+                deals.push(defaultDeal);
+
+                Common.Collection.each(deals, (deal:Data.Event) => {
+                    if (! deal.image){
+                        deal.image =  "http://" + context.paths().staticContentRoot() +  "/Partials/images/default-event.jpg";
+                    }
+                });
                 return new Data.PlainDataResult(result.source, context, deals);
             });
 

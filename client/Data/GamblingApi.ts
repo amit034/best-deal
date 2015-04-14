@@ -130,7 +130,7 @@ module BD.APP.Data {
                     merchantImage: couponResult.merchantImage,
                     revealed: couponResult.revealed,
                     code: couponResult.code,
-                    isDirect: couponResult.isDirect,
+                    isDirect: true,
                     partialCode:couponResult.partialCode
                 };
                 return coupon;

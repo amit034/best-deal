@@ -16,7 +16,11 @@ module BD.APP.Context {
             this._logic = logic;
         }
 
-
+        notificationParams():{[index:string]: string} {
+            var contextParams = super.notificationParams();
+            contextParams['pr'] = this.logic().flag();
+            return contextParams;
+        }
 
     }
 

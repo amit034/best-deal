@@ -8,7 +8,7 @@ module BD.APP.Context {
         paths():IPaths;
         params():AppParams;
         host():string;
-
+        notificationParams():{[index:string]: string};
         isDebugMode():boolean;
 
     }

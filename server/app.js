@@ -1,11 +1,25 @@
+var newrelic = require('newrelic');
 var express = require('express');
 var seatGeek = require('./seatGeek');
 var gamblingCoupons = require('./gamblingCoupons');
+
 var medicalCoupons = require('./medicalCoupons');
 var bwlStore = require('./bwlStore');
 var app = express();
+var https = require('https');
+var http = require('http');
+var fs = require('fs');
 var url = require('url');
 var locale = require("locale");
+var analytics = require("./analytics");
+
+
+// This line is from the Node.js HTTPS documentation.
+var options = {
+  //key: fs.readFileSync('test/fixtures/keys/agent2-key.pem'),
+ // cert: fs.readFileSync('test/fixtures/keys/agent2-cert.pem')
+};
+
 var supported = new locale.Locales(["ru","en", "en_US"]);
 var oneDay = 86400000;
 var bloom = require('bloomfilter');
@@ -39,6 +53,17 @@ app.get('/country', function (req, res,next) {
 			JSON.stringify(result)
 	  )
 });
+
+
+app.get('/notify', function (req, res,next) {
+	var url_parts = url.parse(req.url, true);
+	var query = url_parts.query;
+	
+//	newrelic.recordCustomEvent(eventType, attributes)
+});
+
+
+
 
 app.get('/bwl', function (req, res,next) {
 	var url_parts = url.parse(req.url, true);
@@ -239,6 +264,11 @@ function getBwl(vertical){
 	
 	
 }
-app.listen(3000,"0.0.0.0");
+var httpServer = http.createServer(app);
+//var httpsServer = https.createServer(credentials, app);
+
+httpServer.listen(3000);
+//httpsServer.listen(443);
+
 
 console.log("Server running at http://127.0.0.1:3000/");

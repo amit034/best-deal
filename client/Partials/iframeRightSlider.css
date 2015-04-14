@@ -38,6 +38,7 @@
     text-align: center;
     padding: 0px 5px 0px 0px;
     background-color: #f8f8f8;
+	border-radius : 0px 0px 0px 6px;
     -webkit-box-shadow: 0px 3px 3px -1px rgba(100, 100, 100, 0.3), 0px 0px 3px 0px rgba(100, 100, 100, 0.3);
     -moz-box-shadow: 0px 3px 3px -1px rgba(100, 100, 100, 0.3), 0px 0px 3px 0px rgba(100, 100, 100, 0.3);
     box-shadow: 0px 3px 3px -1px rgba(100, 100, 100, 0.3), 0px 0px 3px 0px rgba(100, 100, 100, 0.3);
@@ -308,7 +309,7 @@
           .fo-container.fo-iframe-right-slider > .fo-sub-wrapper .fo-tabs-wrapper .fo-tab .fo-item:after {
             content: attr(buy-text);
             width: 50%;
-            top: 54px;
+            top: 40%;
             right: 66px;
             position: absolute;
             pointer-events: none;
@@ -344,7 +345,7 @@
           background: white;
           border: 1px dashed #c7c5c9;
           text-align: center;
-          width: 260px;
+          max-width: 250px;
           color: #5E696B;
           cursor: pointer;
           margin-bottom: 8px;
@@ -725,7 +726,7 @@
   }
   
   .fo-container.fo-iframe-right-slider > .fo-sub-wrapper .fo-tabs-wrapper .fo-item  .bd-date {
-		font-size:8px; 
+		font-size:9px; 
 		width: 50%;
 		float: right;
 		text-align: left;

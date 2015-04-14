@@ -197,7 +197,12 @@ module BD.APP.Locale {
             {
                 "key": "compare",
                 "en": "compare"
+            },
 
+            {
+                "key": "reveal_code",
+                "en": "Reveal Code",
+                "ru": "показать код"
             },
             {
                 "key": "buy",

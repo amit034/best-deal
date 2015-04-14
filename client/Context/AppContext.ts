@@ -22,6 +22,21 @@ module BD.APP.Context {
 
         }
 
+        notificationParams():{[index:string]: string} {
+
+            var contextParams:{[index:string]: string} = {
+                'hn': this.host(),
+                'partid': this.params() ? this.params().partnerCode : "",
+                'subid': this.params() ? this.params().subId : "",
+                'v': "001",
+                'fam': 'bd',
+                'dmn': this.paths().domain()
+            };
+
+            return contextParams;
+        }
+
+
 
     }
 

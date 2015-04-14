@@ -41,7 +41,13 @@ module BD.APP.Context {
             this._fnWindow = window;
         }
 
+        notificationParams():{[index:string]: string} {
+            var contextParams = super.notificationParams();
+            contextParams['hid'] = this.userSettings().uuid();
+            contextParams['cc'] = this.countryCode();
 
+            return contextParams;
+        }
 
         static initializePromise(baseContext:IBaseContext, userSettingsPromise:Common.Promise<Common.IUserStore>, suspenderPromise:Common.Promise<Common.ISuspender>,
                                  iframe:Common.IFrameStore, fnWindow:Window):Common.Promise<DomainContext> {

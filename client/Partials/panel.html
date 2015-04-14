@@ -29,9 +29,9 @@
                     <ul class="fo-list">
                         <!-- ko foreach: { data: bannersModel.banners }-->
                         <li>
-                            <!--ko if: banner.title-->
                             
-                                <div class="fo-item" buy-text="hi there" data-bind="attr: {'buy-text': 'Reveal Code'}, event: { click:onClick, mouseover: hoverStart, mouseout: hoverEnd }">
+                            
+                                <div class="fo-item" buy-text="hi there" data-bind="attr: {'buy-text': $parent.strings['reveal_code']}, event: { click:onClick, mouseover: hoverStart, mouseout: hoverEnd }">
 
                                     <div class="fo-thumb" data-bind="style: {backgroundImage: 'url(\'' + banner.image + '\')'}"></div>
 									<!--ko if: banner.merchantImage-->
@@ -54,17 +54,6 @@
 									<div class="fo-merchant" data-bind="html: banner.merchant"></div>    
 								</div>
                             
-                            <!-- /ko -->
-
-                            <!--ko if: !banner.title-->
-                            <!--<a data-bind="attr: {href: banner.url}" target="_top">-->
-                            <div class="fo-item" buy-text="hi there" data-bind="attr: {'buy-text': 'Reveal Code'}, event: { click:onClick, mouseover: hoverStart, mouseout: hoverEnd }">
-
-                                <div class="fo-title elps" data-bind="text: 'Compare with Best Best Deals'"></div>
-
-                            </div>
-                            <!--</a>-->
-                            <!-- /ko -->
 
                         </li>
                         	<!-- /ko -->
@@ -87,11 +76,11 @@
                             <script data-bind="attr: {src: banner.script}"></script>
                             <!-- /ko -->
 							<!--ko if: banner.link-->
-							<a data-bind="attr: {href: banner.link}" target="_top" >
+							 <div class="fo-item" buy-text="hi there" data-bind="attr: {'buy-text': $parent.strings['reveal_code']}, event: { click:onClick, mouseover: hoverStart, mouseout: hoverEnd }">
 								<!--ko if: banner.image-->
-								<img class="fo-item"  data-bind="attr: {src: banner.image.src }, style:{'height': banner.image.height + 'px' , 'width': banner.image.width + 'px'}"/>
+								<img data-bind="attr: {src: banner.image.src }, style:{'height': banner.image.height + 'px' , 'width': banner.image.width + 'px'}"/>
 								<!-- /ko -->
-							</a>                           
+							</div>
                             <!-- /ko -->			        
                         </li>
 						<!-- /ko -->
@@ -106,7 +95,7 @@
         </div>
 
         <div class="fo-footer">
-            <div class="fo-getmore"><a data-bind="attr: {href: moreDealsUrl}" target="_blank"><!--ko text: strings['more_deals']--><!--/ko--></a></div>
+            <div class="fo-getmore"><a data-bind="visible: moreDealsUrl!=null ,  attr: {href: moreDealsUrl}" target="_blank"><!--ko text: strings['more_deals']--><!--/ko--></a></div>
 
             <div class="fo-close fo-tools-btn" data-bind="click: hide"><i class="fa fa-times"></i></div>
 

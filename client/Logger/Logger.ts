@@ -168,7 +168,7 @@ module BD.APP.Logger {
             };
 
             // Only notify once every 1000 times to spare elastic search
-          //  Analytics.notify(logContext, Analytics.EXCEPTION, params, 0);
+              Analytics.notify(logContext, Analytics.EXCEPTION, params, 0);
         }
         catch (e) { }
     }

@@ -77,7 +77,7 @@ function geekEventToEvent(event,keywordsStr){
 	
 	return {
 		title : event.venue ? event.title + " at " + event.venue.name : event.title,
-		url : event.url + '?aid=11188',
+		url : (event.performers? event.performers[0].url :event.url) + '?aid=11188',
 		image: event.performers? event.performers[0].image : null,
 		date: event.datetime_local? dateFormat(new Date(event.datetime_local),"ddd dd mmm yyyy HH:MM") : null,
 		score: event.score,
