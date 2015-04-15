@@ -136,7 +136,7 @@ module BD.APP.Products {
                     // Model binding
                     ko.applyBindings(model, element);
                     ko.applyBindings(model, iframe);
-                    Logger.Analytics.notify(context, Logger.Analytics.IMPRESSION);
+                    Logger.Analytics.notifyClient(context, Logger.Analytics.IMPRESSION);
                 }
                 catch (e) {
                     Common.Collection.of(displayHandlers).each(ds => ds.remove && ds.remove());

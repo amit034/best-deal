@@ -47,9 +47,17 @@ module BD.APP.Model {
 
             this.setPanelVisibilityAndBadges(this.bannersModel,this.coupons);
             this.setMoreDealsTarget(this.bannersModel);
-
-            this.strings = Common.LocaleHelper.getStringMapForCountry("US", Locale.sliderStrings);
-        }
+			var cc:string = context.countryCode();
+            this.strings = Common.LocaleHelper.getStringMapForCountry(cc, Locale.sliderStrings);
+        
+			if (couponContext.logic().flag() == 'medical' && cc.toLowerCase() == 'ru'){
+				this.strings['coupons_header'] = 'Лечение за рубежом';
+				this.strings['coupons_tab'] = 'Особая Акция';
+				this.strings['reveal_code'] = 'Узнать больше';
+				this.strings['coupons_header'] = 'Лечение за рубежом';
+			}
+		
+		}
 
         private setPanelVisibilityAndBadges(bannersModel:BannersModel<Data.Deal> ,coupons:CouponsModel<Coupon>) {
 

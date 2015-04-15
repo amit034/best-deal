@@ -103,7 +103,8 @@
           color: black;
           font-weight: 400; }
       .fo-container.fo-iframe-right-slider > .fo-sub-wrapper .fo-header.fo-coupons-header {
-        color: #3eb585; }
+        color: #3eb585; 
+		font-size: 24px;}
     .fo-container.fo-iframe-right-slider > .fo-sub-wrapper .fo-tabs-wrapper {
       position: relative;
       display: block;
@@ -151,9 +152,11 @@
           .fo-container.fo-iframe-right-slider > .fo-sub-wrapper .fo-tabs-wrapper .fo-tab-handle.fo-deals-tab-handle.fo-active {
             color: #399cde; }
         .fo-container.fo-iframe-right-slider > .fo-sub-wrapper .fo-tabs-wrapper .fo-tab-handle.fo-tab-handle.fo-coupons-tab-handle {
-          width: 105px;
-          left: -64px;
-          top: 183px; }
+			width: 105px;
+			left: -64px;
+			top: 183px;
+			font-size:14px;
+		  }
           .fo-container.fo-iframe-right-slider > .fo-sub-wrapper .fo-tabs-wrapper .fo-tab-handle.fo-tab-handle.fo-coupons-tab-handle.fo-active {
             color: #3eb585; }
       .fo-container.fo-iframe-right-slider > .fo-sub-wrapper .fo-tabs-wrapper .fo-tab {
