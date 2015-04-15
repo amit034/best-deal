@@ -23,7 +23,7 @@ var BD;
                     return "//" +this._domain + "//app";
                 };
                 Paths.prototype.staticContentRoot = function () {
-                    return "//" +this._domain + "";
+                    return "//mirai-client-assets.s3.amazonaws.com/public";
                 };
                 return Paths;
             })();

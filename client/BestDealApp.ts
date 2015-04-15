@@ -70,8 +70,9 @@ module BD.APP {
                 );
             });
 			var bloomFilterPromise = Common.Res.injectScript(externalRoot + 'bloomfilter.js');
-			
-            var libraryPromises = [json3Promise, knockoutPromise, jqueryAndPluginsPromise,bloomFilterPromise];
+
+            var newrelicPromise = Common.Res.injectScript(externalRoot + 'newRelic.js');
+            var libraryPromises = [json3Promise, knockoutPromise, jqueryAndPluginsPromise,bloomFilterPromise,newrelicPromise];
 
             Common.typedWhen<any>(libraryPromises)
                 .done(() => this.loadApplicationSettings(context))

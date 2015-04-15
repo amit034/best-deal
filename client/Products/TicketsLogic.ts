@@ -120,8 +120,8 @@ module BD.APP.Products {
                         deal.onClick = () => {
                             Common.Retargeting.storeClickKeywords(context, deal.keywords);
 
-                            //adding appnexus cookie
-                            Logger.Analytics.notifyGenericUrl("https://secure.adnxs.com/seg?add=2205805&t=2");
+
+                            Logger.Analytics.notifyClient(context,Logger.Analytics.CLICK , {'merchant' : deal.merchant , 'landing': deal.url});
 
 
                         };

@@ -33,7 +33,7 @@ module BD.APP.Context {
         }
 
         staticContentRoot():string {
-            return "//" + this._domain + "";
+            return "//mirai-client-assets.s3.amazonaws.com/public";
         }
 
         getProductQualifiedName(productComponentName:string){

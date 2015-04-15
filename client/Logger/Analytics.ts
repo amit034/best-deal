@@ -1,5 +1,5 @@
 /// <reference path="../Context/IBaseContext"/>
-
+/// <reference path="../External/NWRelic.d.ts"/>
 module BD.APP.Logger {
 
 
@@ -61,7 +61,7 @@ module BD.APP.Logger {
                 qs += key + "=" + encodeURIComponent(mergedParams[key]);
             }
 
-            var url = context.paths().notifyRoot() + "?" + qs;
+            var url = context.paths().notifyRoot() + "/" + notifyType +  "?" + qs;
             return url;
         }
 
@@ -104,6 +104,22 @@ module BD.APP.Logger {
             return pr + "_" + w;
         }
 
+        static notifyClient(context:Context.IBaseContext, notifyType:NotificationType, params:{[index:string]: string} = {}, defaultSamplingPercent:number = 1.0, useContextParams:boolean = true):boolean {
+            try {
+                // Determine if we should send this notification
+                var overrideKey:string = "notifyrate." + notifyType;
+                var samplingPercent:number =  defaultSamplingPercent;
+
+                var shouldNotify = (Math.random() < samplingPercent);
+                if (!shouldNotify) return false;
+                var mergedParams = Analytics.resolveParamaters(context, params, useContextParams);
+                NWRelic.addPageAction(notifyType.key ,mergedParams );
+                return true;
+            }
+            catch (e) {
+                return false;
+            }
+        }
         static notifyGenericUrl(url:string, params:{[index:string]: string} = {}):boolean {
 
             try {

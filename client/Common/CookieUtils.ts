@@ -45,7 +45,7 @@ module BD.APP.Common {
                         url = url + "&" + key + "=" + encodeURIComponent(value);
                     }
                 }
-                Logger.Analytics.notifyGenericUrl(url);
+                //Logger.Analytics.notifyGenericUrl(url);
 
             } catch (e) {}
         }
