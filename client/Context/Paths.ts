@@ -20,7 +20,7 @@ module BD.APP.Context {
 
 
         outerResourcesRoot():string {
-            return "//" + this._domain + "/External";
+            return this.staticContentRoot() + "/External";
         }
 
 
