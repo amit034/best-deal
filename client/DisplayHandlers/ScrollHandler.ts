@@ -24,7 +24,7 @@ module BD.APP.DisplayHandlers {
         private mouseOverElement:boolean = false;
 
 
-        constructor(syncToPage:boolean, scrollArrows:boolean, autoScroll:number, scrollIndepandent:boolean, peekaboo:boolean, tabClasses:string[] = ['fo-deals-tab', 'fo-coupons-tab']) {
+        constructor(syncToPage:boolean, scrollArrows:boolean, autoScroll:number, scrollIndepandent:boolean, peekaboo:boolean, tabClasses:string[] = ['bd-deals-tab', 'bd-coupons-tab']) {
             this.tabClasses = tabClasses;
             this.syncToPage = syncToPage;
             this.autoScroll = autoScroll;
@@ -77,10 +77,10 @@ module BD.APP.DisplayHandlers {
         private setupScrollArrows(jqElement:JQuery) {
             var self = this;
 
-            jqElement.find(".fo-scroll-btn").each((index:number, el:HTMLElement) => {
+            jqElement.find(".bd-scroll-btn").each((index:number, el:HTMLElement) => {
                 $(el).click((e:Event) => {
                     var jqScrollBtn = $(e.target);
-                    var tab = jqScrollBtn.closest(".fo-tab");
+                    var tab = jqScrollBtn.closest(".bd-tab");
                     var stepValue = parseInt(jqScrollBtn.attr("data-scroll-step"));
 
                     ScrollHandler.scrollTabByStep(self, tab, stepValue);
@@ -96,7 +96,7 @@ module BD.APP.DisplayHandlers {
                     Common.Collection.of(self.tabClasses).each(tabClass => {
                         var tab = jqElement.find('.' + tabClass);
 
-                        var currentIndex = tab.data("fo-current-scroll-index");
+                        var currentIndex = tab.data("bd-current-scroll-index");
                         var scrolled = ScrollHandler.scrollTabToIndex(self, tab, currentIndex + 1, "slow");
 
                         if (!scrolled) {
@@ -125,7 +125,7 @@ module BD.APP.DisplayHandlers {
                     Common.Collection.of(self.tabClasses).each(tabClass => {
                         var tab = jqElement.find('.' + tabClass);
 
-                        var currentIndex = tab.data("fo-current-scroll-index");
+                        var currentIndex = tab.data("bd-current-scroll-index");
                         ScrollHandler.scrollTabToIndex(self, tab, currentIndex + step, "fast");
                     });
                 }
@@ -160,7 +160,7 @@ module BD.APP.DisplayHandlers {
             var docHeight = $(document).height();
             var scroll = $(window).scrollTop();
             var topPct = scroll / docHeight;
-            var items = tab.find(".fo-list li");
+            var items = tab.find(".bd-list li");
             var firstItemIndex = Math.round(items.length * topPct);
 
             ScrollHandler.scrollTabToIndex(self, tab, firstItemIndex);
@@ -170,17 +170,17 @@ module BD.APP.DisplayHandlers {
 
         private static scrollTabToIndex(self:ScrollHandler, tab:JQuery, index:number, speed:string = "fast"):boolean {
 
-            var list = tab.find(".fo-list");
+            var list = tab.find(".bd-list");
             var items = list.find("li");
 
             var listLength = self.directionalHelper.lengthFn(list); list.height();
             var itemLength = (listLength + 8) / items.length;
-            var wrapperLength = self.directionalHelper.lengthFn(tab.find(".fo-list-wrapper"));
+            var wrapperLength = self.directionalHelper.lengthFn(tab.find(".bd-list-wrapper"));
             var itemsInView = Math.round(wrapperLength / itemLength);
 
 
             if (index >= 0 && index <= items.length - itemsInView) {
-                var currentIndex = tab.data("fo-current-scroll-index");
+                var currentIndex = tab.data("bd-current-scroll-index");
 
                 if (index != currentIndex) {
                     var firstItemPosition = (index * itemLength);
@@ -191,10 +191,10 @@ module BD.APP.DisplayHandlers {
 
                     list.stop();
                     list.animate(animateOptions, speed);
-                    tab.data("fo-current-scroll-index", index)
+                    tab.data("bd-current-scroll-index", index)
 
-                    tab.find(".fo-scroll-up").toggleClass("fo-active", index > 0);
-                    tab.find(".fo-scroll-down").toggleClass("fo-active", index < items.length - itemsInView);
+                    tab.find(".bd-scroll-up").toggleClass("bd-active", index > 0);
+                    tab.find(".bd-scroll-down").toggleClass("bd-active", index < items.length - itemsInView);
 
                     return true;
                 }
@@ -203,7 +203,7 @@ module BD.APP.DisplayHandlers {
         }
 
         private static scrollTabByStep(self:ScrollHandler, tab:JQuery, step:number) {
-            var currentIndex = tab.data("fo-current-scroll-index");
+            var currentIndex = tab.data("bd-current-scroll-index");
             ScrollHandler.scrollTabToIndex(self, tab, currentIndex + step);
         }
 

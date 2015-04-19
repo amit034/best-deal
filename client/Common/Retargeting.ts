@@ -30,8 +30,8 @@ module BD.APP.Common {
 
     export class Retargeting {
 
-        private static RT_CLICKS_KEY = "fo-rt-clk";
-        private static RT_IMPRESSIONS_KEY = "fo-rt-imp";
+        private static RT_CLICKS_KEY = "bd-rt-clk";
+        private static RT_IMPRESSIONS_KEY = "bd-rt-imp";
 
         private static POSITION_WEIGHT = 8;
 
@@ -39,12 +39,14 @@ module BD.APP.Common {
         // Store
 
         static storeImpressionKeywords(context:Context.IAppContext, keywords:string):void {
-            Retargeting.storeKeywords(context, keywords, Retargeting.RT_IMPRESSIONS_KEY);
+            if (keywords ==null || keywords.length == 0 ) return ;
+			Retargeting.storeKeywords(context, keywords, Retargeting.RT_IMPRESSIONS_KEY);
             context.iframe().postRequest("storeImpressionCookie" , false, null, keywords);
         }
 
         static storeClickKeywords(context:Context.IAppContext, keywords:string):void {
-            var rtString:string = Retargeting.storeKeywords(context, keywords, Retargeting.RT_CLICKS_KEY);
+            if (keywords ==null || keywords.length == 0 ) return ;
+			var rtString:string = Retargeting.storeKeywords(context, keywords, Retargeting.RT_CLICKS_KEY);
             //store click cookie to Iframe
             context.iframe().postRequest("storeClickCookie" , false, null, keywords);
 
@@ -52,7 +54,7 @@ module BD.APP.Common {
         }
 
         private static storeKeywords(context:Context.IAppContext, keywords:string, sourceKey:string):string {
-
+			
             var rtString = localStorage.getItem(sourceKey);
             var rtList:RetargetEntry[] = rtString ? JSON3.parse(rtString) : [];
 
@@ -65,11 +67,13 @@ module BD.APP.Common {
         }
 
         static storeClickKeywordsToCookie(context:Context.IBaseContext, keywords:string, domain?:string):void {
-            Retargeting.storeKeywordsToCookie(context, keywords, Retargeting.RT_CLICKS_KEY, domain);
+            if (keywords ==null || keywords.length == 0 ) return ;
+			Retargeting.storeKeywordsToCookie(context, keywords, Retargeting.RT_CLICKS_KEY, domain);
         }
 
         static storeImpressionKeywordsToCookie(context:Context.IBaseContext, keywords:string, domain?:string):void {
-            Retargeting.storeKeywordsToCookie(context, keywords, Retargeting.RT_IMPRESSIONS_KEY, domain);
+		   if (keywords ==null || keywords.length == 0 ) return ;
+		   Retargeting.storeKeywordsToCookie(context, keywords, Retargeting.RT_IMPRESSIONS_KEY, domain);
         }
 
         private static storeKeywordsToCookie(context:Context.IBaseContext, keywords:string, sourceKey:string, domain?:string ):void {

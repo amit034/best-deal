@@ -1,5 +1,5 @@
-
-class Injector {
+module BD.APP.Bootstrap{
+export class Injector {
 
     private static altDocument:HTMLDocument = null;
 
@@ -66,4 +66,5 @@ class Injector {
         return injectedNatively;
     }
 
+}
 }

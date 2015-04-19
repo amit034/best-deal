@@ -12,10 +12,12 @@ module BD.APP.Common {
         onerror: (ev: Event) => any;
         ontimeout?: (ev: Event) => any;
     }
-
+	
+	import Injector = BD.APP.Bootstrap.Injector;
+	
     export class NativeJSHelper {
 
-
+		
 
         static injectScriptPromise(url:string):Promise<any> {
 

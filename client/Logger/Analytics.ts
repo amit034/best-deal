@@ -13,7 +13,7 @@ module BD.APP.Logger {
         static INIT:NotificationType = { key: 'init' };
         static USER:NotificationType = { key: 'usr' };
         static NO_SHOW:NotificationType = { key: 'noshow' };
-        static IMPRESSION:NotificationType = { key: 'wo' };
+        static IMPRESSION:NotificationType = { key: 'imp' };
         static HOVER:NotificationType = { key: 'ho' };
         static CLICK:NotificationType = { key: 'c' };
         static EXCEPTION:NotificationType = { key: 'exception' };
@@ -113,7 +113,10 @@ module BD.APP.Logger {
                 var shouldNotify = (Math.random() < samplingPercent);
                 if (!shouldNotify) return false;
                 var mergedParams = Analytics.resolveParamaters(context, params, useContextParams);
-                NWRelic.addPageAction(notifyType.key ,mergedParams );
+				var notificationTypeKey = notifyType.key;
+				if(notificationTypeKey && mergedParams){
+					NWRelic.addPageAction(notificationTypeKey ,mergedParams );
+				}
                 return true;
             }
             catch (e) {

@@ -12,7 +12,7 @@ var fs = require('fs');
 var url = require('url');
 var locale = require("locale");
 var analytics = require("./analytics");
-
+var geoip = require('geoip-lite');
 
 // This line is from the Node.js HTTPS documentation.
 var options = {
@@ -45,21 +45,31 @@ app.use(app.router);
 app.use(locale(supported));
 app.use(express.static(__dirname + '/public', { maxAge: oneDay })); 
 app.get('/country', function (req, res,next) {
-	var locales = new locale.Locales(req.headers["accept-language"]);
+		//var locales = new locale.Locales(req.headers["accept-language"]);
 	
-	  var result = {};
-	  result.country =  locales.best(supported);
+	 // var result = {};
+	//  result.country =  locales.best(supported);
+	var ip = req.headers['x-forwarded-for'] ||  req.connection.remoteAddress;
+	var geo = geoip.lookup(ip);
+	
+	  var result ={};
+	  result.country = "US";
+	  
+	  if (geo)
+	  {
+		result.country = geo.country;
+	  }
 	  res.send(
 			JSON.stringify(result)
 	  )
+
 });
 
 
-app.get('/notify', function (req, res,next) {
+app.get('/notify/wo', function (req, res,next) {
 	var url_parts = url.parse(req.url, true);
 	var query = url_parts.query;
-	
-//	newrelic.recordCustomEvent(eventType, attributes)
+	analytics.report('wo',query);
 });
 
 
@@ -75,7 +85,7 @@ app.get('/bwl', function (req, res,next) {
 		})
 		.catch(function (e) {
 			console.log(e);
-			res.status(500, {
+			res.status(500).send({
             error: e
 			});
 		});;
@@ -100,7 +110,7 @@ app.get('/bwl/bl', function (req, res,next) {
 		})
 		.catch(function (e) {
 			console.log(e);
-			res.status(500, {
+			res.status(500).send({
             error: e
 			});
 		});;
@@ -135,12 +145,12 @@ app.get('/medical', function (req, res,next) {
 		})
 		.catch(function (e) {
 			console.log(e);
-			res.status(500, {
+			res.status(500).send({
             error: e
 			});
 		});
 	}else{
-		res.status(400, {
+		res.status(400).send({
             error: "missing query words"
 			});
 	}
@@ -155,7 +165,7 @@ app.get('/gambling', function (req, res,next) {
 		}
 	}
 	
-	if (query.data && query.data.kwc && query.data.kwc.length > 0){
+	if (query.data && query.data.kwc && query.data.kwc.length >= 0){
 		var gamblingRequest = {};
 		gamblingRequest.keywords = [];
 		gamblingRequest.country = query.c;
@@ -174,12 +184,12 @@ app.get('/gambling', function (req, res,next) {
 		})
 		.catch(function (e) {
 			console.log(e);
-			res.status(500, {
+			res.status(500).send({
             error: e
 			});
 		});
 	}else{
-		res.status(400, {
+		res.status(400).send({
             error: "missing query words"
 			});
 	}
@@ -213,12 +223,12 @@ app.get('/tickets', function (req, res,next) {
 		})
 		.catch(function (e) {
 			console.log(e);
-			res.status(500, {
+			res.status(500).send({
             error: e
 			});
 		});
 	}else{
-		res.status(400, {
+		res.status(400).send({
             error: "missing query words"
 			});
 	}

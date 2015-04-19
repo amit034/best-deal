@@ -44,7 +44,7 @@ module BD.APP.Products {
 
 
         getMainCssClass():string {
-            return "fo-iframe-right-slider";
+            return "bd-iframe-right-slider";
         }
 
         getParentElement():HTMLElement {
@@ -68,7 +68,7 @@ module BD.APP.Products {
 			var context = dealsContext || couponsContext;
             var iframeString = resources["container"];
             var iframeElement = $(iframeString);
-            iframeElement.addClass("fo-right-container-frame");
+            iframeElement.addClass("bd-right-container-frame");
             var iframe:HTMLIFrameElement = <HTMLIFrameElement>iframeElement[0];
             Common.CollisionHelper.treatForCollisions(iframeElement);
             Common.HtmlHelper.appendToBody(iframeElement);
@@ -78,7 +78,7 @@ module BD.APP.Products {
 
                 var css1 = $('<link rel="stylesheet" href="' + context.paths().staticContentRoot() + '/Partials/iframeRightSlider.css">');
                 $(iframe.contentDocument.head).append(css1);
-
+		
                 var htmlString = resources["html"];
                 var rootClass = this.getMainCssClass();
 
@@ -136,7 +136,7 @@ module BD.APP.Products {
                     // Model binding
                     ko.applyBindings(model, element);
                     ko.applyBindings(model, iframe);
-                    Logger.Analytics.notifyClient(context, Logger.Analytics.IMPRESSION);
+                    Logger.Analytics.notifyClient(context, Logger.Analytics.IMPRESSION,{});
                 }
                 catch (e) {
                     Common.Collection.of(displayHandlers).each(ds => ds.remove && ds.remove());

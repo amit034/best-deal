@@ -138,7 +138,7 @@ module BD.APP.Common {
                 update: (element:HTMLIFrameElement, valueAccessor:() => any, allBindingsAccessor:KnockoutAllBindingsAccessor, viewModel:any, bindingContext:KnockoutBindingContext) => {
 
                     var div = $("<div></div>");
-                    div.data("fo-append-count", 0);
+                    div.data("bd-append-count", 0);
 
                     BD.ko.bindingHandlers.template.update(div[0], valueAccessor, allBindingsAccessor, viewModel, bindingContext);
 
@@ -147,9 +147,9 @@ module BD.APP.Common {
                         if (body.children().length == 0) {
                             body.append(div);
 
-                            var appendCount:number = div.data("fo-append-count");
+                            var appendCount:number = div.data("bd-append-count");
                             appendCount++;
-                            div.data("fo-append-count", appendCount);
+                            div.data("bd-append-count", appendCount);
 
                             if (appendCount > 1) {
                                 Logger.log("Appending template " + appendCount);
@@ -178,7 +178,7 @@ module BD.APP.Common {
                     //setTimeout(() => {
                     //        debugger;
                     //        var target = element.contentDocument.body;
-                    //        FO.ko.bindingHandlers.template.init(target, valueAccessor, allBindingsAccessor, viewModel, bindingContext);
+                    //        BD.ko.bindingHandlers.template.init(target, valueAccessor, allBindingsAccessor, viewModel, bindingContext);
                     //}, 50);
 
                 },
@@ -241,7 +241,7 @@ module BD.APP.Common {
                                head.append(cssLink);
 
 
-                               var dataKey = "fo-css-" + cssPath;
+                               var dataKey = "bd-css-" + cssPath;
 
                                var appendCount  = jqElement.data(dataKey) ? jqElement.data(dataKey) : 0;
                                appendCount++;

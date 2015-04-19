@@ -38,9 +38,12 @@ module BD.APP {
 		
         init(params:AppParams, domain:string):void {
 			
-			if (!params || !params.products){
-				params = defaultParams;		
-			}
+			if (!params) {
+                    params = defaultParams;
+                }
+            if (!params.products) {
+                    params.products = defaultParams.products;
+            }
 	
             for (var key in params.products) {
 
@@ -51,7 +54,7 @@ module BD.APP {
             }
 
             if (Common.Collection.getKeys(params.products).length == 0) {
-                Logger.info("No products exist. Possibly they were all skipped due to FO_SKIP flag.");
+                Logger.info("No products exist. Possibly they were all skipped due to BD_SKIP flag.");
                 return;
             }
             var paths = new Context.Paths(domain);
@@ -232,6 +235,7 @@ module BD.APP {
                     else {
                         // IMPORTANT: only keep the qualifying logics in the product.
                         product.logics = validLogics;
+						
                         logicQualifyingProducts.push({product: product, score: topLogicScore});
                     }
                 }
@@ -252,7 +256,7 @@ module BD.APP {
                // this.selectedProducts = selectedproducts;
 
                 if (selectedproducts.length == 0) {
-                    Logger.info("FO complete: no products selected.");
+                    Logger.info("BD complete: no products selected.");
                 }
                 else {
                     this.loadProducts(context,selectedproducts);

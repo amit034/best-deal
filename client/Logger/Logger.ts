@@ -44,7 +44,7 @@ module BD.APP.Logger {
         logContext = context;
         logToConsole = context.isDebugMode();
 
-        if (window['FO_NATIVE_DEBUG']) {
+        if (window['BD_NATIVE_DEBUG']) {
             if (console.log) {
                 Logger.log = console.log.bind(console);
                 Logger.info = (console.info) ? console.info.bind(console) : console.log.bind(console);
@@ -103,15 +103,15 @@ module BD.APP.Logger {
             if (logToConsole) {
                 var logFunc:(msg:string) => void = levelToConsoleFunc[level];
                 if (!logFunc) logFunc = (msg) => console.log(msg);
-                var msgEx = "FO - " + (caller ?  msg + " @ " + caller : msg);
+                var msgEx = "BD - " + (caller ?  msg + " @ " + caller : msg);
                 logFunc(msgEx);
 
 
             }
 
-            //if (level >= LogLevel.ERROR) {
-            //    Logger.Analytics.notifyX(logContext, "noshow", { 'reason': 'exception', 'sreason': msg }, 0);
-            //}
+            if (level >= LogLevel.ERROR) {
+                Logger.Analytics.notifyClient(logContext,Logger.Analytics.EXCEPTION, { 'reason': 'exception', 'sreason': msg }, 0);
+            }
 
             if (!logstack) logstack = [];
 

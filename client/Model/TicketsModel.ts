@@ -50,7 +50,7 @@ module BD.APP.Model {
 			var cc:string = context.countryCode();
             this.strings = Common.LocaleHelper.getStringMapForCountry(cc, Locale.sliderStrings);
         
-			if (couponContext.logic().flag() == 'medical' && cc.toLowerCase() == 'ru'){
+			if ((couponContext && couponContext.logic().flag() == 'medical') && cc.toLowerCase() == 'ru') {
 				this.strings['coupons_header'] = 'Лечение за рубежом';
 				this.strings['coupons_tab'] = 'Особая Акция';
 				this.strings['reveal_code'] = 'Узнать больше';
